@@ -1,8 +1,10 @@
 import os
+import re
 
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
+from homunculus.google_maps import open_google_maps, search_location
 from homunculus.playwright_utils import launch_chromium, new_anonymous_context
 
 pytestmark = pytest.mark.skipif(
@@ -17,9 +19,15 @@ def test_google_maps_midterm_acceptance():
         context = new_anonymous_context(browser)
         page = context.new_page()
         try:
-            page.goto("https://www.google.com/maps", wait_until="domcontentloaded")
+            open_google_maps(page)
+            search_location(page, "Cross Creek Ranch community center, Fulshear TX")
             title = page.title()
             assert "google maps" in title.lower()
+
+            panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+            expect(panel).to_contain_text(
+                re.compile(r"(Cross Creek|Fulshear)", re.I), timeout=15000
+            )
         finally:
             context.close()
             browser.close()

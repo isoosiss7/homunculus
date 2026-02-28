@@ -1,9 +1,9 @@
 {
-  "status": "done",
-  "step_id": "milestone_013_snapshot_then_act_helper",
-  "step_name": "Add snapshot_then_act_by_role_ref helper (snapshot->validate->act) and tests; refactor CLI to use it",
+  "human_question": null,
   "last_error": null,
   "needs_human": false,
-  "human_question": null,
-  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464"
+  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
+  "status": "done",
+  "step_id": "milestone_014_google_maps_search_location",
+  "step_name": "Implement Google Maps helper to search for a given location string; extend acceptance test to assert search succeeds"
 }

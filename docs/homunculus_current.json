@@ -1,0 +1,11 @@
+{
+  "status": "idle",
+  "step_id": null,
+  "step_name": null,
+  "started_at": null,
+  "last_heartbeat_at": null,
+  "last_error": null,
+  "needs_human": false,
+  "human_question": null,
+  "run_id": null
+}

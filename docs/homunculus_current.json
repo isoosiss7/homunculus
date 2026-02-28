@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_012_cli_snapshot_act_validate_role_ref",
-  "step_name": "Add snapshot-act CLI command that validates role_ref exists in accessibility snapshot before acting + fixture tests",
+  "step_id": "milestone_013_snapshot_then_act_helper",
+  "step_name": "Add snapshot_then_act_by_role_ref helper (snapshot->validate->act) and tests; refactor CLI to use it",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

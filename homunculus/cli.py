@@ -14,6 +14,7 @@ from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
+from homunculus.snapshot_act import snapshot_then_act_by_role_ref
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -238,21 +239,19 @@ def main() -> int:
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         with _page_for_target(args.target) as page:
-            role_refs = snapshot_role_refs(page, include_roles=None)
-            if args.role_ref not in role_refs:
-                print(
-                    f"Role ref not found in snapshot: {args.role_ref}",
-                    file=sys.stderr,
+            try:
+                snapshot_then_act_by_role_ref(
+                    page,
+                    args.role_ref,
+                    args.action,
+                    args.value,
+                    args.key,
+                    args.timeout_ms,
+                    include_roles=None,
                 )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
                 return 1
-            act_by_role_ref(
-                page,
-                args.role_ref,
-                args.action,
-                args.value,
-                args.key,
-                args.timeout_ms,
-            )
             if args.print_title:
                 print(page.title())
         return 0

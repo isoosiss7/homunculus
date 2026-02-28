@@ -1,11 +1,9 @@
 {
-  "human_question": null,
-  "last_error": null,
-  "last_heartbeat_at": "2026-02-28T19:13:37.004264+00:00",
-  "needs_human": false,
-  "run_id": "1f2316b5043148e3a6993e01ed7d1fb2",
-  "started_at": "2026-02-28T19:13:37.003875+00:00",
   "status": "done",
-  "step_id": "done",
-  "step_name": "Complete"
+  "step_id": "milestone-validate-role-ref",
+  "step_name": "Add RoleRef validation/normalization (role lower-case, nth>=0) and tests",
+  "last_error": null,
+  "needs_human": false,
+  "human_question": null,
+  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464"
 }

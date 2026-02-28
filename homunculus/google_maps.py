@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 import time
-from typing import Iterable
+from typing import Iterable, Sequence
 
 
 def open_google_maps(page) -> None:
@@ -213,32 +213,79 @@ def parse_eta(text: str) -> str | None:
     if not text:
         return None
 
-    hours_pattern = r"(?:hr|hrs|hour|hours|h)"
-    mins_pattern = r"(?:min|mins|minute|minutes)"
-    hour_min_re = re.compile(
-        rf"(?P<hours>\d+)\s*{hours_pattern}\b(?:\s*(?P<mins>\d+)\s*{mins_pattern}\b)?",
-        re.IGNORECASE,
-    )
-    mins_only_re = re.compile(
-        rf"(?P<mins>\d+)\s*{mins_pattern}\b",
-        re.IGNORECASE,
-    )
+    hour_min_re, mins_only_re = _eta_regexes()
 
     match = hour_min_re.search(text)
     if match:
-        hours = int(match.group("hours"))
-        mins_group = match.group("mins")
-        mins = int(mins_group) if mins_group is not None else None
-        if mins is not None and mins > 0:
-            return f"{hours} hr {mins} min"
-        return f"{hours} hr"
+        return _format_eta(match.group("hours"), match.group("mins"))
 
     match = mins_only_re.search(text)
     if match:
-        mins = int(match.group("mins"))
-        return f"{mins} min"
+        return _format_eta(None, match.group("mins"))
 
     return None
+
+
+def find_etas(text: str) -> list[str]:
+    """Return all normalized ETA strings found in text."""
+    if not text:
+        return []
+
+    hour_min_re, mins_only_re = _eta_regexes()
+    spans: list[tuple[int, int]] = []
+    results: list[str] = []
+
+    for match in hour_min_re.finditer(text):
+        results.append(_format_eta(match.group("hours"), match.group("mins")))
+        spans.append(match.span())
+
+    for match in mins_only_re.finditer(text):
+        if _span_overlaps(match.span(), spans):
+            continue
+        results.append(_format_eta(None, match.group("mins")))
+
+    seen: set[str] = set()
+    deduped = []
+    for eta in results:
+        if eta not in seen:
+            seen.add(eta)
+            deduped.append(eta)
+    return deduped
+
+
+def eta_to_minutes(eta: str) -> int | None:
+    """Convert a normalized ETA string like '1 hr 5 min' to total minutes."""
+    if not eta:
+        return None
+
+    hour_min_re, mins_only_re = _eta_regexes()
+    match = hour_min_re.search(eta)
+    if match:
+        hours = int(match.group("hours"))
+        mins_group = match.group("mins")
+        mins = int(mins_group) if mins_group else 0
+        return hours * 60 + mins
+
+    match = mins_only_re.search(eta)
+    if match:
+        return int(match.group("mins"))
+
+    return None
+
+
+def select_shortest_eta(texts: Iterable[str]) -> str | None:
+    """Pick the shortest ETA from a collection of direction route texts."""
+    best_eta: str | None = None
+    best_minutes: int | None = None
+    for text in texts:
+        for eta in find_etas(text):
+            minutes = eta_to_minutes(eta)
+            if minutes is None:
+                continue
+            if best_minutes is None or minutes < best_minutes:
+                best_minutes = minutes
+                best_eta = eta
+    return best_eta
 
 
 def open_directions_for_current_place(page) -> None:
@@ -257,3 +304,200 @@ def open_directions_for_current_place(page) -> None:
         route_panel.first.wait_for(state="visible", timeout=5000)
     except Exception:
         return
+
+
+def get_driving_eta(page, origin: str, destination_place_name: str) -> str:
+    """Return the shortest driving ETA between origin and destination on Google Maps."""
+    if not origin or not destination_place_name:
+        raise ValueError("Origin and destination are required to fetch driving ETA.")
+
+    _handle_consent_dialog(page)
+
+    if not _is_directions_button_visible(page):
+        search_location(page, destination_place_name)
+
+    if not _is_directions_button_visible(page):
+        _open_first_place_result(page)
+
+    open_directions_for_current_place(page)
+    _ensure_origin_filled(page, origin)
+    _select_driving_mode(page)
+
+    eta = _wait_for_shortest_eta(page, timeout=25000)
+    if not eta:
+        raise ValueError("Unable to find a driving ETA on Google Maps.")
+    return eta
+
+
+def _eta_regexes() -> tuple[re.Pattern, re.Pattern]:
+    hours_pattern = r"(?:hr|hrs|hour|hours|h)"
+    mins_pattern = r"(?:min|mins|minute|minutes)"
+    hour_min_re = re.compile(
+        rf"(?P<hours>\d+)\s*{hours_pattern}\b(?:\s*(?P<mins>\d+)\s*{mins_pattern}\b)?",
+        re.IGNORECASE,
+    )
+    mins_only_re = re.compile(
+        rf"(?P<mins>\d+)\s*{mins_pattern}\b",
+        re.IGNORECASE,
+    )
+    return hour_min_re, mins_only_re
+
+
+def _format_eta(hours: str | None, mins: str | None) -> str:
+    if hours:
+        hours_value = int(hours)
+        mins_value = int(mins) if mins else 0
+        if mins_value:
+            return f"{hours_value} hr {mins_value} min"
+        return f"{hours_value} hr"
+    mins_value = int(mins) if mins else 0
+    return f"{mins_value} min"
+
+
+def _span_overlaps(span: tuple[int, int], spans: Sequence[tuple[int, int]]) -> bool:
+    start, end = span
+    for existing_start, existing_end in spans:
+        if start < existing_end and end > existing_start:
+            return True
+    return False
+
+
+def _is_directions_button_visible(page) -> bool:
+    button = page.get_by_role("button", name=re.compile(r"directions", re.I)).first
+    try:
+        return button.is_visible()
+    except Exception:
+        return False
+
+
+def _open_first_place_result(page) -> None:
+    panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+    try:
+        panel.wait_for(state="visible", timeout=10000)
+    except Exception:
+        return
+
+    items = _locate_results_items(panel)
+    try:
+        count = items.count()
+    except Exception:
+        return
+
+    for index in range(count):
+        item = items.nth(index)
+        try:
+            if not item.is_visible():
+                continue
+        except Exception:
+            continue
+        try:
+            link = item.get_by_role("link").first
+            if link.is_visible():
+                link.click()
+                return
+        except Exception:
+            pass
+        try:
+            item.click()
+            return
+        except Exception:
+            continue
+
+
+def _ensure_origin_filled(page, origin: str) -> None:
+    scope = _directions_scope(page)
+    patterns = [
+        re.compile(r"starting point", re.I),
+        re.compile(r"choose starting point", re.I),
+        re.compile(r"from", re.I),
+        re.compile(r"your location", re.I),
+    ]
+    locator = None
+    for role in ("combobox", "textbox"):
+        for pattern in patterns:
+            candidate = scope.get_by_role(role, name=pattern).first
+            try:
+                candidate.wait_for(state="visible", timeout=5000)
+                locator = candidate
+                break
+            except Exception:
+                continue
+        if locator:
+            break
+
+    if locator is None:
+        locator = _find_search_box(page)
+
+    locator.click()
+    locator.fill(origin)
+    locator.press("Enter")
+
+
+def _select_driving_mode(page) -> None:
+    scope = _directions_scope(page)
+    patterns = [
+        re.compile(r"driving", re.I),
+        re.compile(r"car", re.I),
+    ]
+    for role in ("button", "tab"):
+        for pattern in patterns:
+            button = scope.get_by_role(role, name=pattern).first
+            try:
+                button.wait_for(state="visible", timeout=3000)
+                button.click()
+                return
+            except Exception:
+                continue
+
+
+def _wait_for_shortest_eta(page, timeout: int = 20000) -> str | None:
+    deadline = time.time() + (timeout / 1000)
+    scope = _directions_scope(page)
+    while time.time() < deadline:
+        texts = _collect_route_texts(scope)
+        eta = select_shortest_eta(texts)
+        if eta:
+            return eta
+        time.sleep(0.25)
+    return None
+
+
+def _directions_scope(page):
+    panel = page.get_by_role("region", name=re.compile(r"directions", re.I)).first
+    try:
+        panel.wait_for(state="visible", timeout=2000)
+        return panel
+    except Exception:
+        return page
+
+
+def _collect_route_texts(scope) -> list[str]:
+    locators = [
+        scope.get_by_role("listitem"),
+        scope.get_by_role("article"),
+        scope.locator("[role='listitem']"),
+        scope.locator("[role='article']"),
+    ]
+    texts: list[str] = []
+    for locator in locators:
+        try:
+            count = locator.count()
+        except Exception:
+            continue
+        for index in range(count):
+            item = locator.nth(index)
+            try:
+                if not item.is_visible():
+                    continue
+                text = item.inner_text().strip()
+            except Exception:
+                continue
+            if text:
+                texts.append(text)
+        if texts:
+            return texts
+    try:
+        text = scope.inner_text().strip()
+    except Exception:
+        return []
+    return [text] if text else []

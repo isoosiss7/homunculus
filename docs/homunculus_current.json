@@ -4,6 +4,6 @@
   "needs_human": false,
   "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
   "status": "done",
-  "step_id": "gmaps_directions_eta",
-  "step_name": "Google Maps: open directions + parse driving ETA"
+  "step_id": "gmaps_eta_workflow",
+  "step_name": "Google Maps: driving ETA workflow (origin -> place)"
 }

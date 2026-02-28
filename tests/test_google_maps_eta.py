@@ -3,7 +3,12 @@ from __future__ import annotations
 from html.parser import HTMLParser
 from pathlib import Path
 
-from homunculus.google_maps import parse_eta
+from homunculus.google_maps import (
+    eta_to_minutes,
+    find_etas,
+    parse_eta,
+    select_shortest_eta,
+)
 
 
 class _DirectionsCaseParser(HTMLParser):
@@ -55,3 +60,25 @@ def test_parse_eta_from_fixture_cases() -> None:
 def test_parse_eta_none_when_missing() -> None:
     text = "No routes available. Try again later."
     assert parse_eta(text) is None
+
+
+def test_find_etas_from_fixture_cases() -> None:
+    cases = _load_fixture_cases()
+    assert cases
+    for expected, text in cases:
+        assert expected in find_etas(text)
+
+
+def test_eta_to_minutes() -> None:
+    assert eta_to_minutes("12 min") == 12
+    assert eta_to_minutes("1 hr") == 60
+    assert eta_to_minutes("1 hr 5 min") == 65
+
+
+def test_select_shortest_eta() -> None:
+    texts = [
+        "Fastest route 20 min",
+        "Alternate route 1 hr 5 min",
+        "Scenic route 15 min",
+    ]
+    assert select_shortest_eta(texts) == "15 min"

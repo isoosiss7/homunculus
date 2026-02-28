@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_007_cli_act_outputs_title_for_fixture_tests",
-  "step_name": "Extend act-by-role-ref CLI to optionally print page title; add pytest to validate click + nth targeting via local HTML fixture",
+  "step_id": "milestone_008_role_ref_roundtrip_fill_and_cli_print_title",
+  "step_name": "Add snapshot->act roundtrip fill test and CLI fill --print-title assertion using local HTML fixture",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

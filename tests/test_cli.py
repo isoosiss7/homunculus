@@ -106,3 +106,31 @@ def test_cli_act_by_role_ref_click_print_title() -> None:
 
     assert result.returncode == 0
     assert "clicked-1" in result.stdout
+
+
+def test_cli_act_by_role_ref_fill_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="textbox", name="User name", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "fill",
+            "--value",
+            "Ada",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "Ada" in result.stdout

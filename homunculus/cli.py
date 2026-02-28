@@ -27,6 +27,10 @@ def build_parser() -> argparse.ArgumentParser:
         "target",
         help="Target URL (http/https) or local HTML file path",
     )
+    snapshot_parser.add_argument(
+        "--roles",
+        help="Comma-separated list of ARIA roles to include",
+    )
 
     act_parser = subparsers.add_parser(
         "act-by-role-ref",
@@ -89,8 +93,18 @@ def main() -> int:
         return 0
 
     if args.command == "snapshot-role-refs":
+        include_roles = None
+        if args.roles is not None:
+            if not args.roles.strip():
+                parser.error("--roles cannot be empty")
+            include_roles = set()
+            for entry in args.roles.split(","):
+                role = entry.strip().lower()
+                if not role:
+                    parser.error("--roles cannot be empty")
+                include_roles.add(role)
         with _page_for_target(args.target) as page:
-            role_refs = snapshot_role_refs(page)
+            role_refs = snapshot_role_refs(page, include_roles=include_roles)
         for role_ref in role_refs:
             print(role_ref)
         return 0

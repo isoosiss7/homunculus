@@ -1,9 +1,11 @@
 {
-  "status": "done",
-  "step_id": "milestone_008_role_ref_roundtrip_fill_and_cli_print_title",
-  "step_name": "Add snapshot->act roundtrip fill test and CLI fill --print-title assertion using local HTML fixture",
-  "last_error": null,
-  "needs_human": false,
   "human_question": null,
-  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464"
+  "last_error": null,
+  "last_heartbeat_at": "2026-02-28T19:13:37.004264+00:00",
+  "needs_human": false,
+  "run_id": "1f2316b5043148e3a6993e01ed7d1fb2",
+  "started_at": "2026-02-28T19:13:37.003875+00:00",
+  "status": "done",
+  "step_id": "done",
+  "step_name": "Complete"
 }

@@ -47,6 +47,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--value",
         help="Value to fill when using action=fill",
     )
+    act_parser.add_argument(
+        "--print-title",
+        action="store_true",
+        help="Print page title after performing the action",
+    )
 
     return parser
 
@@ -95,6 +100,8 @@ def main() -> int:
             parser.error("action 'fill' requires --value")
         with _page_for_target(args.target) as page:
             act_by_role_ref(page, args.role_ref, args.action, args.value)
+            if args.print_title:
+                print(page.title())
         return 0
 
     parser.error("Unknown command")

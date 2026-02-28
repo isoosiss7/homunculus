@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_004_generic_act_by_role_ref",
-  "step_name": "Add generic act_by_role_ref dispatcher + fixture test coverage",
+  "step_id": "milestone_005_snapshot_to_act_roundtrip_test",
+  "step_name": "Add fixture integration test: snapshot_role_refs -> act_by_role_ref roundtrip",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

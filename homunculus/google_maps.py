@@ -482,9 +482,53 @@ def _ensure_origin_filled(page, origin: str) -> None:
     if locator is None:
         locator = _find_search_box(page)
 
-    locator.click()
+    _focus_and_clear(locator)
     locator.fill(origin)
-    locator.press("Enter")
+    time.sleep(0.2)
+
+    if not _try_click_autocomplete_option(scope) and not _try_click_autocomplete_option(page):
+        _best_effort_press(locator, "ArrowDown")
+        _best_effort_press(locator, "Enter")
+    time.sleep(0.4)
+
+
+def _focus_and_clear(locator) -> None:
+    try:
+        locator.click()
+    except Exception:
+        return
+
+    _best_effort_press(locator, "Control+A")
+    _best_effort_press(locator, "Meta+A")
+    _best_effort_press(locator, "Backspace")
+    _best_effort_press(locator, "Delete")
+    try:
+        locator.fill("")
+    except Exception:
+        pass
+
+
+def _best_effort_press(locator, key: str) -> None:
+    try:
+        locator.press(key)
+    except Exception:
+        return
+
+
+def _try_click_autocomplete_option(scope) -> bool:
+    listbox = scope.get_by_role("listbox").first
+    try:
+        listbox.wait_for(state="visible", timeout=600)
+    except Exception:
+        return False
+
+    option = listbox.get_by_role("option").first
+    try:
+        option.wait_for(state="visible", timeout=600)
+        option.click()
+        return True
+    except Exception:
+        return False
 
 
 def _select_driving_mode(page) -> None:

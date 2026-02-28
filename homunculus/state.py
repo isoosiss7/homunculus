@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 DEFAULT_STATE_PATH = Path("docs/homunculus_current.json")
 
 

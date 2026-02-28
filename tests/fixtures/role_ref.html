@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RoleRef Fixture</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      #result {
+        margin-top: 12px;
+        font-weight: bold;
+      }
+    </style>
+    <script>
+      function setResult(value) {
+        document.getElementById("result").textContent = value;
+        document.title = value;
+      }
+    </script>
+  </head>
+  <body>
+    <button type="button" onclick="setResult('clicked-0')">Submit</button>
+    <button type="button" onclick="setResult('clicked-1')">Submit</button>
+    <div id="result">idle</div>
+  </body>
+</html>

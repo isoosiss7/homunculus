@@ -8,7 +8,6 @@ from uuid import uuid4
 from homunculus.models import Done
 from homunculus.state import save_state
 
-
 ARTIFACTS_ROOT = Path(".homunculus/runs")
 
 

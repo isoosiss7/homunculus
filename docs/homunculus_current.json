@@ -1,11 +1,11 @@
 {
-  "status": "idle",
-  "step_id": null,
-  "step_name": null,
-  "started_at": null,
-  "last_heartbeat_at": null,
-  "last_error": null,
-  "needs_human": false,
   "human_question": null,
-  "run_id": null
+  "last_error": null,
+  "last_heartbeat_at": "2026-02-28T17:11:00Z",
+  "needs_human": false,
+  "run_id": "f61cc72879284c2fa6735c8789a725a4",
+  "started_at": "2026-02-28T17:11:00Z",
+  "status": "done",
+  "step_id": "milestone_001_role_ref_click_fixture_test",
+  "step_name": "Add role-ref click action + local HTML fixture test"
 }

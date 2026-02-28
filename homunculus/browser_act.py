@@ -34,9 +34,7 @@ def act_by_role_ref(
         locator.press(key, **action_options)
         return
 
-    raise ValueError(
-        f"Unsupported action '{action}'. Supported actions: click, fill, press."
-    )
+    raise ValueError(f"Unsupported action '{action}'. Supported actions: click, fill, press.")
 
 
 def act_click_by_role_ref(page, role_ref_str: str) -> None:

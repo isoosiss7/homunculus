@@ -323,9 +323,7 @@ def select_shortest_eta(texts: Iterable[str]) -> str | None:
 
 def open_directions_for_current_place(page) -> None:
     """Click the Directions button for the current place and wait briefly."""
-    directions_button = page.get_by_role(
-        "button", name=re.compile(r"directions", re.I)
-    ).first
+    directions_button = page.get_by_role("button", name=re.compile(r"directions", re.I)).first
     try:
         directions_button.wait_for(state="visible", timeout=5000)
         directions_button.click()

@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from playwright.sync_api import sync_playwright
 
+from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.google_maps import (
     get_driving_eta,
     get_top_place_results,
@@ -66,6 +67,41 @@ def _should_run_headless() -> bool:
     return False
 
 
+def _capture_maps_failure(page, run_id: str, error: Exception) -> None:
+    artifacts_dir = ARTIFACTS_ROOT / run_id
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    metadata = {
+        "run_id": run_id,
+        "captured_at": _utc_now(),
+        "url": None,
+        "error": {"type": type(error).__name__, "message": str(error)},
+    }
+
+    try:
+        metadata["url"] = page.url
+    except Exception:
+        metadata["url"] = None
+
+    try:
+        page.screenshot(path=str(artifacts_dir / "failure.png"), full_page=True)
+    except Exception:
+        pass
+
+    try:
+        role_refs = snapshot_role_refs(page)
+    except Exception:
+        role_refs = []
+    (artifacts_dir / "failure_role_refs.json").write_text(
+        json.dumps(role_refs, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (artifacts_dir / "failure_metadata.json").write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _run_maps_midterm(intent: MapsMidtermIntent, run_id: str) -> Done:
     with sync_playwright() as playwright:
         browser = launch_chromium(playwright, headless=_should_run_headless())
@@ -81,6 +117,9 @@ def _run_maps_midterm(intent: MapsMidtermIntent, run_id: str) -> Done:
             for place_name in places:
                 eta = get_driving_eta(page, intent.origin, place_name)
                 results.append({"name": place_name, "eta": eta})
+        except Exception as exc:
+            _capture_maps_failure(page, run_id, exc)
+            raise
         finally:
             context.close()
             browser.close()
@@ -92,9 +131,7 @@ def _run_maps_midterm(intent: MapsMidtermIntent, run_id: str) -> Done:
         "run_id": run_id,
     }
 
-    summary = (
-        f"DONE: Found {len(results)} {intent.query} near {intent.origin} with ETAs."
-    )
+    summary = f"DONE: Found {len(results)} {intent.query} near {intent.origin} with ETAs."
     return Done(summary=summary, result_json=result_json)
 
 

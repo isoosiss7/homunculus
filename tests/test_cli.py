@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -79,6 +80,31 @@ def test_cli_snapshot_role_refs_roles_filter() -> None:
     role_refs = result.stdout.splitlines()
     assert RoleRef(role="button", name="Submit", nth=0).to_str() in role_refs
     assert RoleRef(role="textbox", name="User name", nth=0).to_str() not in role_refs
+
+
+def test_cli_snapshot_role_refs_json() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-role-refs",
+            str(fixture_path),
+            "--json",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    role_refs = json.loads(result.stdout)
+    assert role_refs == sorted(role_refs)
+    assert RoleRef(role="button", name="Submit", nth=0).to_str() in role_refs
+    assert RoleRef(role="textbox", name="User name", nth=0).to_str() in role_refs
 
 
 def test_cli_act_by_role_ref_fill() -> None:

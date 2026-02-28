@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
@@ -31,6 +32,11 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_parser.add_argument(
         "--roles",
         help="Comma-separated list of ARIA roles to include",
+    )
+    snapshot_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print role refs as a JSON array (sorted for stable output)",
     )
 
     act_parser = subparsers.add_parser(
@@ -115,8 +121,11 @@ def main() -> int:
                 include_roles.add(role)
         with _page_for_target(args.target) as page:
             role_refs = snapshot_role_refs(page, include_roles=include_roles)
-        for role_ref in role_refs:
-            print(role_ref)
+        if args.json:
+            print(json.dumps(sorted(role_refs)))
+        else:
+            for role_ref in role_refs:
+                print(role_ref)
         return 0
 
     if args.command == "act-by-role-ref":

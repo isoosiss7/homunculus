@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_010_act_timeout_ms",
-  "step_name": "Add --timeout-ms to act-by-role-ref and thread timeout into role-ref actions",
+  "step_id": "milestone_010_snapshot_role_refs_json_output",
+  "step_name": "Add --json output option to snapshot-role-refs CLI with local fixture test",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

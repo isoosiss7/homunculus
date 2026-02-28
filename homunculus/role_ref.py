@@ -6,7 +6,8 @@ from urllib.parse import quote, unquote
 try:
     from pydantic import BaseModel, field_validator
 except ImportError:  # pragma: no cover - pydantic v1 fallback
-    from pydantic import BaseModel, validator as field_validator
+    from pydantic import BaseModel
+    from pydantic import validator as field_validator
 
 
 class RoleRef(BaseModel):

@@ -12,6 +12,7 @@ from homunculus.agent import run
 from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.playwright_utils import new_anonymous_context
+from homunculus.role_ref import RoleRef
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -68,6 +69,56 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print page title after performing the action",
     )
     act_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Action timeout in milliseconds",
+    )
+
+    act_role_parser = subparsers.add_parser(
+        "act",
+        aliases=["act-by-role"],
+        help="Perform an action on a role/name selector",
+    )
+    act_role_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    act_role_parser.add_argument(
+        "--role",
+        required=True,
+        help="ARIA role of the target element",
+    )
+    act_role_parser.add_argument(
+        "--name",
+        required=True,
+        help="Accessible name of the target element",
+    )
+    act_role_parser.add_argument(
+        "--nth",
+        type=int,
+        default=0,
+        help="Zero-based index when multiple elements match (default: 0)",
+    )
+    act_role_parser.add_argument(
+        "--action",
+        choices=["click", "fill", "press"],
+        required=True,
+        help="Action to perform",
+    )
+    act_role_parser.add_argument(
+        "--value",
+        help="Value to fill when using action=fill",
+    )
+    act_role_parser.add_argument(
+        "--key",
+        help="Key to press when using action=press",
+    )
+    act_role_parser.add_argument(
+        "--print-title",
+        action="store_true",
+        help="Print page title after performing the action",
+    )
+    act_role_parser.add_argument(
         "--timeout-ms",
         type=int,
         help="Action timeout in milliseconds",
@@ -137,6 +188,25 @@ def main() -> int:
             act_by_role_ref(
                 page,
                 args.role_ref,
+                args.action,
+                args.value,
+                args.key,
+                args.timeout_ms,
+            )
+            if args.print_title:
+                print(page.title())
+        return 0
+
+    if args.command in {"act", "act-by-role"}:
+        if args.action == "fill" and args.value is None:
+            parser.error("action 'fill' requires --value")
+        if args.action == "press" and args.key is None:
+            parser.error("action 'press' requires --key")
+        role_ref = RoleRef(role=args.role, name=args.name, nth=args.nth).to_str()
+        with _page_for_target(args.target) as page:
+            act_by_role_ref(
+                page,
+                role_ref,
                 args.action,
                 args.value,
                 args.key,

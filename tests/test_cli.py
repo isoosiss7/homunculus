@@ -215,3 +215,63 @@ def test_cli_act_by_role_ref_press_print_title() -> None:
 
     assert result.returncode == 0
     assert "pressed-enter" in result.stdout
+
+
+def test_cli_act_click_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act",
+            str(fixture_path),
+            "--role",
+            "button",
+            "--name",
+            "Submit",
+            "--nth",
+            "1",
+            "--action",
+            "click",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "clicked-1" in result.stdout
+
+
+def test_cli_act_fill_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act",
+            str(fixture_path),
+            "--role",
+            "textbox",
+            "--name",
+            "User name",
+            "--action",
+            "fill",
+            "--value",
+            "Ada",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "Ada" in result.stdout

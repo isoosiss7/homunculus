@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_002_role_ref_fill_fixture_test",
-  "step_name": "Add role-ref fill/type action + local HTML fixture test",
+  "step_id": "milestone_003_role_ref_snapshot_fixture_test",
+  "step_name": "Add role-ref accessibility snapshot (page -> RoleRef list) + fixture test",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

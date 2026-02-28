@@ -1,9 +1,11 @@
 {
   "human_question": null,
   "last_error": null,
+  "last_heartbeat_at": "2026-02-28T22:02:57.440558+00:00",
   "needs_human": false,
-  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
-  "status": "in_progress",
-  "step_id": "gmaps_top_results",
-  "step_name": "Google Maps: search places nearby + extract top results"
+  "run_id": "5e14a7a5fc45480ba0fe2f5af307cb67",
+  "started_at": "2026-02-28T22:02:57.440005+00:00",
+  "status": "done",
+  "step_id": "done",
+  "step_name": "Complete"
 }

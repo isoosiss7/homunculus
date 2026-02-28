@@ -206,3 +206,54 @@ def _is_sponsored_text(item) -> bool:
     except Exception:
         return False
     return bool(re.search(r"\bsponsored\b|\bad\b", text))
+
+
+def parse_eta(text: str) -> str | None:
+    """Parse a driving ETA string from Google Maps directions UI text."""
+    if not text:
+        return None
+
+    hours_pattern = r"(?:hr|hrs|hour|hours|h)"
+    mins_pattern = r"(?:min|mins|minute|minutes)"
+    hour_min_re = re.compile(
+        rf"(?P<hours>\d+)\s*{hours_pattern}\b(?:\s*(?P<mins>\d+)\s*{mins_pattern}\b)?",
+        re.IGNORECASE,
+    )
+    mins_only_re = re.compile(
+        rf"(?P<mins>\d+)\s*{mins_pattern}\b",
+        re.IGNORECASE,
+    )
+
+    match = hour_min_re.search(text)
+    if match:
+        hours = int(match.group("hours"))
+        mins_group = match.group("mins")
+        mins = int(mins_group) if mins_group is not None else None
+        if mins is not None and mins > 0:
+            return f"{hours} hr {mins} min"
+        return f"{hours} hr"
+
+    match = mins_only_re.search(text)
+    if match:
+        mins = int(match.group("mins"))
+        return f"{mins} min"
+
+    return None
+
+
+def open_directions_for_current_place(page) -> None:
+    """Click the Directions button for the current place and wait briefly."""
+    directions_button = page.get_by_role(
+        "button", name=re.compile(r"directions", re.I)
+    ).first
+    try:
+        directions_button.wait_for(state="visible", timeout=5000)
+        directions_button.click()
+    except Exception:
+        return
+
+    route_panel = page.get_by_role("region", name=re.compile(r"directions", re.I))
+    try:
+        route_panel.first.wait_for(state="visible", timeout=5000)
+    except Exception:
+        return

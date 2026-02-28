@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_011_act_by_role_name_cli",
-  "step_name": "Add CLI subcommand to act by role+name (without requiring role_ref encoding) + fixture tests",
+  "step_id": "milestone_012_cli_snapshot_act_validate_role_ref",
+  "step_name": "Add snapshot-act CLI command that validates role_ref exists in accessibility snapshot before acting + fixture tests",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

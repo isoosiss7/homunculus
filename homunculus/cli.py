@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
@@ -69,6 +70,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print page title after performing the action",
     )
     act_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Action timeout in milliseconds",
+    )
+
+    snapshot_act_parser = subparsers.add_parser(
+        "snapshot-act",
+        help="Validate a role ref exists and perform an action on it",
+    )
+    snapshot_act_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    snapshot_act_parser.add_argument("role_ref", help="Role ref string to act on")
+    snapshot_act_parser.add_argument(
+        "--action",
+        choices=["click", "fill", "press"],
+        required=True,
+        help="Action to perform",
+    )
+    snapshot_act_parser.add_argument(
+        "--value",
+        help="Value to fill when using action=fill",
+    )
+    snapshot_act_parser.add_argument(
+        "--key",
+        help="Key to press when using action=press",
+    )
+    snapshot_act_parser.add_argument(
+        "--print-title",
+        action="store_true",
+        help="Print page title after performing the action",
+    )
+    snapshot_act_parser.add_argument(
         "--timeout-ms",
         type=int,
         help="Action timeout in milliseconds",
@@ -185,6 +220,31 @@ def main() -> int:
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         with _page_for_target(args.target) as page:
+            act_by_role_ref(
+                page,
+                args.role_ref,
+                args.action,
+                args.value,
+                args.key,
+                args.timeout_ms,
+            )
+            if args.print_title:
+                print(page.title())
+        return 0
+
+    if args.command == "snapshot-act":
+        if args.action == "fill" and args.value is None:
+            parser.error("action 'fill' requires --value")
+        if args.action == "press" and args.key is None:
+            parser.error("action 'press' requires --key")
+        with _page_for_target(args.target) as page:
+            role_refs = snapshot_role_refs(page, include_roles=None)
+            if args.role_ref not in role_refs:
+                print(
+                    f"Role ref not found in snapshot: {args.role_ref}",
+                    file=sys.stderr,
+                )
+                return 1
             act_by_role_ref(
                 page,
                 args.role_ref,

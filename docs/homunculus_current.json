@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_003_role_ref_snapshot_fixture_test",
-  "step_name": "Add role-ref accessibility snapshot (page -> RoleRef list) + fixture test",
+  "step_id": "milestone_004_generic_act_by_role_ref",
+  "step_name": "Add generic act_by_role_ref dispatcher + fixture test coverage",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

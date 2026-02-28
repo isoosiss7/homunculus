@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone-google-maps-acceptance-scaffold",
-  "step_name": "Add Playwright anonymous context helper + Google Maps acceptance test scaffold (skipped by default)",
+  "step_id": "milestone-cli-anonymous-playwright-context",
+  "step_name": "Use new_anonymous_context helper in CLI Playwright flows (snapshot + act) for consistency",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

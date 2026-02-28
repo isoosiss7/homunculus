@@ -10,6 +10,7 @@ from playwright.sync_api import sync_playwright
 from homunculus.agent import run
 from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
+from homunculus.playwright_utils import new_anonymous_context
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -73,7 +74,7 @@ def _page_for_target(target: str):
     target_url = _resolve_target(target)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
-        context = browser.new_context()
+        context = new_anonymous_context(browser)
         try:
             page = context.new_page()
             page.goto(target_url, wait_until="domcontentloaded")

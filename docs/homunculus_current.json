@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone_005_snapshot_to_act_roundtrip_test",
-  "step_name": "Add fixture integration test: snapshot_role_refs -> act_by_role_ref roundtrip",
+  "step_id": "milestone_006_cli_snapshot_and_act_subcommands",
+  "step_name": "Add CLI subcommands: snapshot-role-refs and act-by-role-ref (URL or HTML file)",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

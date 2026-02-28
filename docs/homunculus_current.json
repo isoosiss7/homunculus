@@ -4,6 +4,6 @@
   "needs_human": false,
   "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
   "status": "done",
-  "step_id": "m1_agent_maps_workflow",
-  "step_name": "Implement agent Google Maps workflow for Thai restaurants ETA demo"
+  "step_id": "milestone_playwright_hardening",
+  "step_name": "Harden Playwright anonymous context defaults"
 }

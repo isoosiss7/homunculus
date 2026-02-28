@@ -7,6 +7,7 @@ from playwright.sync_api import expect, sync_playwright
 from homunculus.google_maps import (
     get_top_place_results,
     get_driving_eta,
+    locate_results_panel,
     open_google_maps,
     search_location,
     search_places_nearby,
@@ -30,7 +31,7 @@ def test_google_maps_midterm_acceptance():
             title = page.title()
             assert "google maps" in title.lower()
 
-            panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+            panel = locate_results_panel(page)
             expect(panel).to_contain_text(
                 re.compile(r"(Cross Creek|Fulshear)", re.I), timeout=15000
             )

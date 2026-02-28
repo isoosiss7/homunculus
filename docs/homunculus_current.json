@@ -4,6 +4,6 @@
   "needs_human": false,
   "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
   "status": "done",
-  "step_id": "milestone_artifacts_on_failure",
-  "step_name": "Capture screenshot + role-ref snapshot on Google Maps midterm failure"
+  "step_id": "milestone_results_panel_locator",
+  "step_name": "Add locate_results_panel helper for headless Google Maps UI variants"
 }

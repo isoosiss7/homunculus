@@ -38,12 +38,35 @@ def search_places_nearby(page, base_location: str, place_query: str) -> None:
     search_location(page, f"{place_query} near {base_location}")
 
 
+def locate_results_panel(page):
+    """Return the best locator for the results panel in Google Maps."""
+    candidates = [
+        page.get_by_role("region", name=re.compile(r"results for", re.I)),
+        page.get_by_role("region", name=re.compile(r"explore this area", re.I)),
+        page.get_by_role("region", name=re.compile(r"available filters", re.I)),
+    ]
+    for locator in candidates:
+        target = locator.first
+        try:
+            target.wait_for(state="visible", timeout=15000)
+            return target
+        except Exception:
+            continue
+
+    fallback = page.locator("[role=main]").first
+    try:
+        fallback.wait_for(state="visible", timeout=5000)
+    except Exception:
+        pass
+    return fallback
+
+
 def get_top_place_results(page, limit: int = 2) -> list[str]:
     """Return the visible names of the top N place results from the results panel."""
     if limit <= 0:
         return []
 
-    panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+    panel = locate_results_panel(page)
     try:
         panel.wait_for(state="visible", timeout=15000)
     except Exception as exc:
@@ -148,7 +171,7 @@ def _try_dismiss_in_frame(frame) -> bool:
 
 
 def _wait_for_results_panel(page, query: str) -> None:
-    panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+    panel = locate_results_panel(page)
     try:
         panel.wait_for(state="visible", timeout=15000)
     except Exception:
@@ -402,7 +425,7 @@ def _is_directions_button_visible(page) -> bool:
 
 
 def _open_first_place_result(page) -> None:
-    panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+    panel = locate_results_panel(page)
     try:
         panel.wait_for(state="visible", timeout=10000)
     except Exception:

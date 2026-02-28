@@ -18,11 +18,22 @@
         document.getElementById("result").textContent = value;
         document.title = value;
       }
+
+      function handleUsernameKeydown(event) {
+        if (event.key === "Enter") {
+          setResult("pressed-enter");
+        }
+      }
     </script>
   </head>
   <body>
     <label for="username">User name</label>
-    <input id="username" type="text" oninput="setResult(this.value)" />
+    <input
+      id="username"
+      type="text"
+      oninput="setResult(this.value)"
+      onkeydown="handleUsernameKeydown(event)"
+    />
     <button type="button" onclick="setResult('clicked-0')">Submit</button>
     <button type="button" onclick="setResult('clicked-1')">Submit</button>
     <div id="result">idle</div>

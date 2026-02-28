@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone-cli-anonymous-playwright-context",
-  "step_name": "Use new_anonymous_context helper in CLI Playwright flows (snapshot + act) for consistency",
+  "step_id": "milestone-role-ref-press-action",
+  "step_name": "Add role-ref action: press (with CLI support and fixture tests)",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

@@ -44,13 +44,17 @@ def build_parser() -> argparse.ArgumentParser:
     act_parser.add_argument("role_ref", help="Role ref string to act on")
     act_parser.add_argument(
         "--action",
-        choices=["click", "fill"],
+        choices=["click", "fill", "press"],
         required=True,
         help="Action to perform",
     )
     act_parser.add_argument(
         "--value",
         help="Value to fill when using action=fill",
+    )
+    act_parser.add_argument(
+        "--key",
+        help="Key to press when using action=press",
     )
     act_parser.add_argument(
         "--print-title",
@@ -113,8 +117,10 @@ def main() -> int:
     if args.command == "act-by-role-ref":
         if args.action == "fill" and args.value is None:
             parser.error("action 'fill' requires --value")
+        if args.action == "press" and args.key is None:
+            parser.error("action 'press' requires --key")
         with _page_for_target(args.target) as page:
-            act_by_role_ref(page, args.role_ref, args.action, args.value)
+            act_by_role_ref(page, args.role_ref, args.action, args.value, args.key)
             if args.print_title:
                 print(page.title())
         return 0

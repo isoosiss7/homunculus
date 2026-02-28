@@ -8,6 +8,7 @@ def act_by_role_ref(
     role_ref_str: str,
     action: str,
     value: str | None = None,
+    key: str | None = None,
 ) -> None:
     """Perform an action on an element addressed by a role ref string."""
     role_ref = RoleRef.from_str(role_ref_str)
@@ -23,7 +24,15 @@ def act_by_role_ref(
         locator.fill(value)
         return
 
-    raise ValueError(f"Unsupported action '{action}'. Supported actions: click, fill.")
+    if action == "press":
+        if key is None:
+            raise ValueError("action 'press' requires a key to be provided")
+        locator.press(key)
+        return
+
+    raise ValueError(
+        f"Unsupported action '{action}'. Supported actions: click, fill, press."
+    )
 
 
 def act_click_by_role_ref(page, role_ref_str: str) -> None:

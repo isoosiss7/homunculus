@@ -7,9 +7,18 @@ import time
 from typing import Iterable, Sequence
 
 
+_SEARCH_BOX_TIMEOUT_MS = 8000
+
+
 def open_google_maps(page) -> None:
     """Open Google Maps with consistent load behavior."""
     page.goto("https://www.google.com/maps", wait_until="domcontentloaded")
+    _handle_consent_dialog(page)
+
+    if not _wait_for_search_box(page, timeout_ms=_SEARCH_BOX_TIMEOUT_MS):
+        page.reload(wait_until="domcontentloaded")
+        _handle_consent_dialog(page)
+        _wait_for_search_box(page, timeout_ms=_SEARCH_BOX_TIMEOUT_MS)
 
 
 def search_location(page, query: str) -> None:
@@ -84,6 +93,30 @@ def _find_search_box(page):
         except Exception:
             continue
     return page.locator("input#searchboxinput")
+
+
+def _wait_for_search_box(page, timeout_ms: int) -> bool:
+    deadline = time.time() + (timeout_ms / 1000)
+    locators = [
+        page.get_by_role("combobox", name=re.compile(r"search", re.I)),
+        page.get_by_role("textbox", name=re.compile(r"search", re.I)),
+        page.locator("input#searchboxinput"),
+    ]
+
+    while True:
+        remaining_ms = int((deadline - time.time()) * 1000)
+        if remaining_ms <= 0:
+            return False
+        for locator in locators:
+            target = locator.first
+            try:
+                target.wait_for(state="visible", timeout=min(1000, remaining_ms))
+                if target.is_enabled():
+                    return True
+            except Exception:
+                continue
+        if remaining_ms > 200:
+            time.sleep(0.05)
 
 
 def _handle_consent_dialog(page) -> None:

@@ -1,9 +1,11 @@
 {
   "human_question": null,
   "last_error": null,
+  "last_heartbeat_at": "2026-02-28T23:05:50.298457+00:00",
   "needs_human": false,
-  "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
+  "run_id": "b1d3a0c4fc8f4cafbcd2c48986e090d3",
+  "started_at": "2026-02-28T23:05:50.297994+00:00",
   "status": "done",
-  "step_id": "milestone_playwright_hardening",
-  "step_name": "Harden Playwright anonymous context defaults"
+  "step_id": "done",
+  "step_name": "Complete"
 }

@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone-validate-role-ref",
-  "step_name": "Add RoleRef validation/normalization (role lower-case, nth>=0) and tests",
+  "step_id": "milestone-google-maps-acceptance-scaffold",
+  "step_name": "Add Playwright anonymous context helper + Google Maps acceptance test scaffold (skipped by default)",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

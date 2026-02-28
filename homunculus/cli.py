@@ -61,6 +61,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print page title after performing the action",
     )
+    act_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Action timeout in milliseconds",
+    )
 
     return parser
 
@@ -120,7 +125,14 @@ def main() -> int:
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         with _page_for_target(args.target) as page:
-            act_by_role_ref(page, args.role_ref, args.action, args.value, args.key)
+            act_by_role_ref(
+                page,
+                args.role_ref,
+                args.action,
+                args.value,
+                args.key,
+                args.timeout_ms,
+            )
             if args.print_title:
                 print(page.title())
         return 0

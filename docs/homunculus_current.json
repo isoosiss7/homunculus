@@ -1,7 +1,7 @@
 {
   "status": "done",
-  "step_id": "milestone-role-ref-press-action",
-  "step_name": "Add role-ref action: press (with CLI support and fixture tests)",
+  "step_id": "milestone_010_act_timeout_ms",
+  "step_name": "Add --timeout-ms to act-by-role-ref and thread timeout into role-ref actions",
   "last_error": null,
   "needs_human": false,
   "human_question": null,

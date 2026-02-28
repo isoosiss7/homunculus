@@ -123,6 +123,8 @@ def test_cli_act_by_role_ref_click_print_title() -> None:
             "--action",
             "click",
             "--print-title",
+            "--timeout-ms",
+            "1000",
         ],
         check=False,
         capture_output=True,

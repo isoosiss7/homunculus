@@ -3,7 +3,7 @@
   "last_error": null,
   "needs_human": false,
   "run_id": "e103752f-a855-4da4-9e8f-d6fd4001d464",
-  "status": "done",
-  "step_id": "milestone_014_google_maps_search_location",
-  "step_name": "Implement Google Maps helper to search for a given location string; extend acceptance test to assert search succeeds"
+  "status": "in_progress",
+  "step_id": "gmaps_top_results",
+  "step_name": "Google Maps: search places nearby + extract top results"
 }

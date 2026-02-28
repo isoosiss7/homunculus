@@ -24,6 +24,57 @@ def search_location(page, query: str) -> None:
     _wait_for_results_panel(page, query)
 
 
+def search_places_nearby(page, base_location: str, place_query: str) -> None:
+    """Search for places near a base location and wait for the results panel."""
+    search_location(page, f"{place_query} near {base_location}")
+
+
+def get_top_place_results(page, limit: int = 2) -> list[str]:
+    """Return the visible names of the top N place results from the results panel."""
+    if limit <= 0:
+        return []
+
+    panel = page.get_by_role("region", name=re.compile(r"results for", re.I))
+    try:
+        panel.wait_for(state="visible", timeout=15000)
+    except Exception as exc:
+        raise ValueError("Results panel not found or not visible on Google Maps.") from exc
+
+    items = _locate_results_items(panel)
+    names: list[str] = []
+    seen = set()
+    try:
+        count = items.count()
+    except Exception as exc:
+        raise ValueError("Unable to read place results from Google Maps.") from exc
+
+    for index in range(count):
+        item = items.nth(index)
+        try:
+            if not item.is_visible():
+                continue
+        except Exception:
+            continue
+        name = _extract_place_name(item)
+        if not name:
+            continue
+        if _is_sponsored_name(name) or _is_sponsored_text(item):
+            continue
+        normalized = name.strip()
+        if not normalized or normalized in seen:
+            continue
+        names.append(normalized)
+        seen.add(normalized)
+        if len(names) >= limit:
+            break
+
+    if len(names) < limit:
+        raise ValueError(
+            f"Only found {len(names)} visible place results; expected at least {limit}."
+        )
+    return names
+
+
 def _find_search_box(page):
     for role in ("combobox", "textbox"):
         locator = page.get_by_role(role, name=re.compile(r"search", re.I))
@@ -86,3 +137,72 @@ def _wait_for_results_panel(page, query: str) -> None:
 def _query_tokens(query: str) -> Iterable[str]:
     tokens = [part.strip().lower() for part in re.split(r"[,\s]+", query)]
     return [token for token in tokens if len(token) > 3]
+
+
+def _locate_results_items(panel):
+    selectors = [
+        panel.get_by_role("article"),
+        panel.locator("div[role='article']"),
+        panel.locator("[role='feed'] [role='article']"),
+    ]
+    for locator in selectors:
+        try:
+            if locator.first.is_visible():
+                return locator
+        except Exception:
+            continue
+    return panel.locator("div[role='article']")
+
+
+def _extract_place_name(item) -> str:
+    candidates: list[str] = []
+    try:
+        aria = item.get_attribute("aria-label")
+        if aria:
+            candidates.append(aria)
+    except Exception:
+        pass
+
+    locator_candidates = [
+        item.get_by_role("heading"),
+        item.locator("div[role='heading']"),
+        item.locator("span[role='heading']"),
+        item.locator("a[href*='/maps/place']"),
+        item.locator("a[aria-label]"),
+    ]
+    for locator in locator_candidates:
+        try:
+            target = locator.first
+            if target.is_visible():
+                text = target.inner_text().strip()
+                if text:
+                    candidates.append(text)
+        except Exception:
+            continue
+
+    if not candidates:
+        try:
+            text = item.inner_text().strip()
+        except Exception:
+            text = ""
+        if text:
+            candidates.append(text.splitlines()[0].strip())
+
+    for candidate in candidates:
+        cleaned = candidate.strip()
+        if cleaned and len(cleaned) <= 120:
+            return cleaned
+    return ""
+
+
+def _is_sponsored_name(name: str) -> bool:
+    lowered = name.lower()
+    return "sponsored" in lowered or lowered.startswith("ad ")
+
+
+def _is_sponsored_text(item) -> bool:
+    try:
+        text = item.inner_text().lower()
+    except Exception:
+        return False
+    return bool(re.search(r"\bsponsored\b|\bad\b", text))

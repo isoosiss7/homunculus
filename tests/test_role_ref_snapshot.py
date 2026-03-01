@@ -30,6 +30,15 @@ def test_snapshot_role_refs() -> None:
             assert RoleRef(role="button", name="Submit", nth=0).to_str() in role_refs
             assert RoleRef(role="button", name="Submit", nth=1).to_str() in role_refs
             assert RoleRef(role="textbox", name="User name", nth=0).to_str() in role_refs
+            assert (
+                RoleRef(role="button", name="Hidden Submit", nth=0).to_str() not in role_refs
+            )
+
+            role_refs_all = snapshot_role_refs(page, visible_only=False)
+            assert (
+                RoleRef(role="button", name="Hidden Submit", nth=0).to_str()
+                in role_refs_all
+            )
         finally:
             context.close()
             browser.close()

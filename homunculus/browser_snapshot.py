@@ -5,7 +5,9 @@ from homunculus.role_ref import RoleRef
 DEFAULT_INCLUDE_ROLES = {"button", "textbox", "link", "checkbox", "radio", "combobox"}
 
 
-def snapshot_role_refs(page, include_roles: set[str] | None = None) -> list[str]:
+def snapshot_role_refs(
+    page, include_roles: set[str] | None = None, visible_only: bool = True
+) -> list[str]:
     roles = include_roles or DEFAULT_INCLUDE_ROLES
     role_refs: list[str] = []
     counters: dict[tuple[str, str], int] = {}
@@ -59,13 +61,19 @@ def snapshot_role_refs(page, include_roles: set[str] | None = None) -> list[str]
 """
 
     for role in sorted(roles):
-        locator = page.get_by_role(role)
+        locator = page.get_by_role(role, include_hidden=True)
         try:
             count = locator.count()
         except Exception:
             continue
         for index in range(count):
             element = locator.nth(index)
+            if visible_only:
+                try:
+                    if not element.is_visible():
+                        continue
+                except Exception:
+                    pass
             try:
                 name = element.evaluate(name_script)
             except Exception:

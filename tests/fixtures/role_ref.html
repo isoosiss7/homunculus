@@ -24,6 +24,31 @@
           setResult("pressed-enter");
         }
       }
+
+      function formatModifiers(event) {
+        const modifiers = [];
+        if (event.shiftKey) {
+          modifiers.push("shift");
+        }
+        if (event.altKey) {
+          modifiers.push("alt");
+        }
+        if (event.ctrlKey) {
+          modifiers.push("control");
+        }
+        if (event.metaKey) {
+          modifiers.push("meta");
+        }
+        return modifiers.join("+") || "none";
+      }
+
+      function handleModifierClick(event) {
+        setResult(`modifiers:${formatModifiers(event)}`);
+      }
+
+      function handleDoubleClick() {
+        setResult("double-clicked");
+      }
     </script>
   </head>
   <body>
@@ -46,6 +71,10 @@
     <button type="button" onclick="setResult('clicked-1')">Submit</button>
     <button type="button" style="display: none">Hidden Submit</button>
     <button type="button" onmouseover="setResult('hovered')">Hover target</button>
+    <button type="button" onclick="handleModifierClick(event)">
+      Modifier target
+    </button>
+    <button type="button" ondblclick="handleDoubleClick()">Double target</button>
     <div id="result">idle</div>
   </body>
 </html>

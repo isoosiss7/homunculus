@@ -13,16 +13,27 @@ def act_by_role_ref(
     timeout_ms: int | None = None,
     state: str | None = None,
     slowly: bool | None = None,
+    modifiers: list[str] | None = None,
+    button: str | None = None,
+    double_click: bool | None = None,
 ) -> None:
     """Perform an action on an element addressed by a role ref string."""
     role_ref = RoleRef.from_str(role_ref_str)
     locator = page.get_by_role(role_ref.role, name=role_ref.name).nth(role_ref.nth)
-    action_options: dict[str, int] = {}
+    action_options: dict[str, object] = {}
     if timeout_ms is not None:
         action_options["timeout"] = timeout_ms
 
     if action == "click":
-        locator.click(**action_options)
+        click_options = dict(action_options)
+        if modifiers:
+            click_options["modifiers"] = modifiers
+        if button:
+            click_options["button"] = button
+        if double_click:
+            locator.dblclick(**click_options)
+        else:
+            locator.click(**click_options)
         return
 
     if action == "fill":

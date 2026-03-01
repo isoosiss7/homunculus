@@ -13,6 +13,9 @@ def snapshot_then_act_by_role_ref(
     timeout_ms: int | None = None,
     state: str | None = None,
     slowly: bool | None = None,
+    modifiers: list[str] | None = None,
+    button: str | None = None,
+    double_click: bool | None = None,
     include_roles: set[str] | None = None,
 ) -> None:
     """Snapshot role refs, validate presence, then perform an action."""
@@ -33,6 +36,9 @@ def snapshot_then_act_by_role_ref(
         timeout_ms,
         state,
         slowly,
+        modifiers,
+        button,
+        double_click,
     )
 
 

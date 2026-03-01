@@ -11,6 +11,7 @@ from homunculus.role_snapshot import snapshot_role_snapshot
 from homunculus.role_snapshot_act import (
     snapshot_then_act_by_ref,
     snapshot_then_extract_text_by_ref,
+    snapshot_then_evaluate_by_ref,
 )
 
 
@@ -105,6 +106,56 @@ def test_snapshot_then_extract_text_by_ref_missing_ref_timeout() -> None:
 
             assert snapshot.stats["count"] > 0
             assert text == ""
+        finally:
+            context.close()
+            browser.close()
+
+
+def test_snapshot_then_evaluate_by_ref_text_content() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser, context, page = _load_fixture_page(playwright, html)
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        try:
+            snapshot = snapshot_role_snapshot(page)
+            target_role_ref = RoleRef(role="button", name="Submit", nth=0).to_str()
+            ref = next(
+                item.ref for item in snapshot.items if item.role_ref == target_role_ref
+            )
+
+            snapshot, result = snapshot_then_evaluate_by_ref(
+                page, ref, "(el) => el.textContent"
+            )
+
+            assert snapshot.stats["count"] > 0
+            assert result == "Submit"
+        finally:
+            context.close()
+            browser.close()
+
+
+def test_snapshot_then_evaluate_by_ref_missing_ref_timeout() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser, context, page = _load_fixture_page(playwright, html)
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        try:
+            snapshot, result = snapshot_then_evaluate_by_ref(
+                page, "e999", "(el) => el.textContent", timeout_ms=100
+            )
+
+            assert snapshot.stats["count"] > 0
+            assert result is None
         finally:
             context.close()
             browser.close()

@@ -4,6 +4,7 @@ from homunculus.role_snapshot import (
     RoleSnapshot,
     act_by_ref,
     extract_text_by_ref,
+    evaluate_by_ref,
     snapshot_role_snapshot,
 )
 
@@ -75,4 +76,32 @@ def snapshot_then_extract_text_by_ref(
     return snapshot, text
 
 
-__all__ = ["snapshot_then_act_by_ref", "snapshot_then_extract_text_by_ref"]
+def snapshot_then_evaluate_by_ref(
+    page,
+    ref: str,
+    fn: str,
+    include_roles: set[str] | None = None,
+    visible_only: bool = True,
+    timeout_ms: int | None = None,
+    state: str | None = None,
+) -> tuple[RoleSnapshot, object]:
+    """Snapshot role refs, then evaluate against the referenced element."""
+    snapshot = snapshot_role_snapshot(
+        page,
+        include_roles=include_roles,
+        visible_only=visible_only,
+    )
+    if ref not in snapshot.ref_to_role_ref:
+        if timeout_ms is None:
+            raise ValueError(f"Ref not found in snapshot: {ref}")
+        return snapshot, None
+
+    result = evaluate_by_ref(page, snapshot, ref, fn, timeout_ms, state)
+    return snapshot, result
+
+
+__all__ = [
+    "snapshot_then_act_by_ref",
+    "snapshot_then_extract_text_by_ref",
+    "snapshot_then_evaluate_by_ref",
+]

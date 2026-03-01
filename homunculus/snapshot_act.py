@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from homunculus.browser_act import act_by_role_ref, extract_text_by_role_ref
+from homunculus.browser_evaluate import evaluate_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 
 
@@ -64,4 +65,26 @@ def snapshot_then_extract_text_by_role_ref(
     return extract_text_by_role_ref(page, role_ref_str, timeout_ms, state)
 
 
-__all__ = ["snapshot_then_act_by_role_ref", "snapshot_then_extract_text_by_role_ref"]
+def snapshot_then_evaluate_by_role_ref(
+    page,
+    role_ref_str: str,
+    fn: str,
+    include_roles: set[str] | None = None,
+    timeout_ms: int | None = None,
+    state: str | None = None,
+) -> object:
+    """Snapshot role refs, then evaluate against the referenced element."""
+    role_refs = snapshot_role_refs(page, include_roles=include_roles)
+    if role_ref_str not in role_refs:
+        if timeout_ms is None:
+            raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
+        # Allow waiting for elements that appear later.
+
+    return evaluate_by_role_ref(page, role_ref_str, fn, timeout_ms, state)
+
+
+__all__ = [
+    "snapshot_then_act_by_role_ref",
+    "snapshot_then_extract_text_by_role_ref",
+    "snapshot_then_evaluate_by_role_ref",
+]

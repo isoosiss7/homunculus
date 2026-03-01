@@ -240,6 +240,120 @@ def test_cli_act_by_role_ref_fill_print_title() -> None:
     assert "Ada" in result.stdout
 
 
+def test_cli_act_by_role_ref_select_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="combobox", name="Assistant", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "select",
+            "--value",
+            "Ada Lovelace",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "ada" in result.stdout
+
+
+def test_cli_act_by_role_ref_click_modifiers_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Modifier target", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "click",
+            "--modifiers",
+            "shift",
+            "--modifiers",
+            "alt",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "modifiers:shift+alt" in result.stdout
+
+
+def test_cli_act_by_role_ref_double_click_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Double target", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "click",
+            "--double-click",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "double-clicked" in result.stdout
+
+
+def test_cli_act_by_role_ref_modifiers_requires_click() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="textbox", name="User name", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "fill",
+            "--value",
+            "Ada",
+            "--modifiers",
+            "shift",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "only be used with action 'click'" in result.stderr
+
+
 def test_cli_act_by_role_ref_press_print_title() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
@@ -344,6 +458,33 @@ def test_cli_snapshot_act_click_print_title() -> None:
 
     assert result.returncode == 0
     assert "clicked-1" in result.stdout
+
+
+def test_cli_snapshot_act_double_click_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Double target", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-act",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "click",
+            "--double-click",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "double-clicked" in result.stdout
 
 
 def test_cli_snapshot_act_wait() -> None:
@@ -521,6 +662,66 @@ def test_cli_act_click_print_title() -> None:
 
     assert result.returncode == 0
     assert "clicked-1" in result.stdout
+
+
+def test_cli_act_select_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act",
+            str(fixture_path),
+            "--role",
+            "combobox",
+            "--name",
+            "Assistant",
+            "--action",
+            "select",
+            "--value",
+            "Grace Hopper",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "grace" in result.stdout
+
+
+def test_cli_act_click_modifiers_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act",
+            str(fixture_path),
+            "--role",
+            "button",
+            "--name",
+            "Modifier target",
+            "--action",
+            "click",
+            "--modifiers",
+            "shift",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "modifiers:shift" in result.stdout
 
 
 def test_cli_act_wait() -> None:

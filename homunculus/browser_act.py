@@ -4,6 +4,34 @@ from homunculus.role_ref import RoleRef
 from homunculus.web import extract_text
 
 
+def _normalize_modifiers(modifiers: list[str]) -> list[str]:
+    """Normalize modifier names to Playwright's expected casing.
+
+    Playwright expects: Alt, Control, ControlOrMeta, Meta, Shift.
+    We accept common lower-case / shorthand inputs.
+    """
+
+    mapping = {
+        "alt": "Alt",
+        "option": "Alt",
+        "shift": "Shift",
+        "control": "Control",
+        "ctrl": "Control",
+        "meta": "Meta",
+        "cmd": "Meta",
+        "command": "Meta",
+        "controlormeta": "ControlOrMeta",
+    }
+    normalized: list[str] = []
+    for m in modifiers:
+        key = m.strip()
+        if not key:
+            continue
+        k = key.lower()
+        normalized.append(mapping.get(k, key))
+    return normalized
+
+
 def act_by_role_ref(
     page,
     role_ref_str: str,
@@ -27,7 +55,7 @@ def act_by_role_ref(
     if action == "click":
         click_options = dict(action_options)
         if modifiers:
-            click_options["modifiers"] = modifiers
+            click_options["modifiers"] = _normalize_modifiers(modifiers)
         if button:
             click_options["button"] = button
         if double_click:

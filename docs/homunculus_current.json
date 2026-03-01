@@ -1,23 +1,13 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T04:55:45.343079+00:00",
-  "last_milestone": {
-    "files": [
-      "homunculus/browser_act.py",
-      "homunculus/role_snapshot.py",
-      "homunculus/role_snapshot_act.py",
-      "homunculus/__init__.py",
-      "tests/fixtures/drag_drop.html",
-      "tests/test_drag.py"
-    ],
-    "title": "Add drag primitives (role-ref + snapshot ref)"
-  },
+  "last_heartbeat_at": "2026-03-01T05:11:49.796973+00:00",
+  "last_milestone": "cli_act_parity_select_modifiers_double_click",
+  "last_milestone_at": "2026-03-01T05:13:57.480845+00:00",
   "needs_human": false,
-  "run_id": "f7e73c588a514c2f918ecfd8e2b9c3b9",
-  "started_at": "2026-03-01T04:55:45.342710+00:00",
+  "run_id": "47e08c778a764828a1b023579e881537",
+  "started_at": "2026-03-01T05:11:49.796522+00:00",
   "status": "done",
-  "step_id": "done",
-  "step_name": "Complete",
-  "updated_at": "2026-03-01T04:56:49.664895+00:00"
+  "step_id": "milestone",
+  "step_name": "CLI act parity: select/modifiers/button/double-click"
 }

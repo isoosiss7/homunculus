@@ -1,16 +1,16 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T06:54:15.606161+00:00",
+  "last_heartbeat_at": "2026-03-01T07:10:48.046004+00:00",
   "last_milestone": {
-    "id": "snapshot_then_wait",
-    "summary": "Added snapshot_then_wait helper (pre-wait RoleSnapshot + page condition waits)"
+    "id": "browser_primitives_wrapper",
+    "summary": "Added BrowserPrimitives wrapper (snapshot/act/wait/extract/evaluate) + unit test"
   },
-  "last_milestone_at": "2026-03-01T06:55:44.952177+00:00",
+  "last_milestone_at": "2026-03-01T07:12:51.620934+00:00",
   "needs_human": false,
-  "run_id": "bd407ecf0c9f400b83f12a7988f87cee",
-  "started_at": "2026-03-01T06:54:15.605829+00:00",
+  "run_id": "ca6ef69c37b448eb9a99889cefe4c630",
+  "started_at": "2026-03-01T07:10:48.045563+00:00",
   "status": "done",
   "step_id": "milestone",
-  "step_name": "snapshot_then_wait"
+  "step_name": "browser_primitives_wrapper"
 }

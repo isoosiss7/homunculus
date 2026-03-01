@@ -101,6 +101,27 @@ def extract_text_by_role_ref(
     return extract_text(locator)
 
 
+def drag_by_role_ref(
+    page,
+    start_role_ref_str: str,
+    end_role_ref_str: str,
+    timeout_ms: int | None = None,
+) -> None:
+    """Drag from a role ref source to a role ref target."""
+    start_role_ref = RoleRef.from_str(start_role_ref_str)
+    end_role_ref = RoleRef.from_str(end_role_ref_str)
+    start_locator = page.get_by_role(
+        start_role_ref.role, name=start_role_ref.name
+    ).nth(start_role_ref.nth)
+    end_locator = page.get_by_role(end_role_ref.role, name=end_role_ref.name).nth(
+        end_role_ref.nth
+    )
+    drag_options: dict[str, object] = {}
+    if timeout_ms is not None:
+        drag_options["timeout"] = timeout_ms
+    start_locator.drag_to(end_locator, **drag_options)
+
+
 def act_click_by_role_ref(page, role_ref_str: str) -> None:
     """Click the element referenced by a role ref string."""
     act_by_role_ref(page, role_ref_str, "click")

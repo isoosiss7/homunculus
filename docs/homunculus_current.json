@@ -1,13 +1,23 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T04:41:48.163106+00:00",
-  "milestone": "Add wait CLI primitive exposing browser_wait.wait_for (selector/url/load/fn/text/text-gone) + tests",
-  "milestone_id": "cli-wait-primitive",
+  "last_heartbeat_at": "2026-03-01T04:55:45.343079+00:00",
+  "last_milestone": {
+    "files": [
+      "homunculus/browser_act.py",
+      "homunculus/role_snapshot.py",
+      "homunculus/role_snapshot_act.py",
+      "homunculus/__init__.py",
+      "tests/fixtures/drag_drop.html",
+      "tests/test_drag.py"
+    ],
+    "title": "Add drag primitives (role-ref + snapshot ref)"
+  },
   "needs_human": false,
-  "run_id": "61eb6cbd18074cbbb78138db700dc298",
-  "started_at": "2026-03-01T04:41:48.162985+00:00",
+  "run_id": "f7e73c588a514c2f918ecfd8e2b9c3b9",
+  "started_at": "2026-03-01T04:55:45.342710+00:00",
   "status": "done",
   "step_id": "done",
-  "step_name": "Complete"
+  "step_name": "Complete",
+  "updated_at": "2026-03-01T04:56:49.664895+00:00"
 }

@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
-from homunculus.browser_act import act_by_role_ref, extract_text_by_role_ref
+from homunculus.browser_act import (
+    act_by_role_ref,
+    drag_by_role_ref,
+    extract_text_by_role_ref,
+)
 from homunculus.browser_evaluate import evaluate_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.role_ref import RoleRef
@@ -114,6 +118,22 @@ def extract_text_by_ref(
     return extract_text_by_role_ref(page, role_ref, timeout_ms, state)
 
 
+def drag_by_ref(
+    page,
+    snapshot: RoleSnapshot,
+    start_ref: str,
+    end_ref: str,
+    timeout_ms: int | None = None,
+) -> None:
+    if start_ref not in snapshot.ref_to_role_ref:
+        raise ValueError(f"Ref not found in snapshot: {start_ref}")
+    if end_ref not in snapshot.ref_to_role_ref:
+        raise ValueError(f"Ref not found in snapshot: {end_ref}")
+    start_role_ref = snapshot.ref_to_role_ref[start_ref]
+    end_role_ref = snapshot.ref_to_role_ref[end_ref]
+    drag_by_role_ref(page, start_role_ref, end_role_ref, timeout_ms)
+
+
 def evaluate_by_ref(
     page,
     snapshot: RoleSnapshot,
@@ -132,6 +152,7 @@ __all__ = [
     "RoleSnapshot",
     "RoleSnapshotItem",
     "act_by_ref",
+    "drag_by_ref",
     "extract_text_by_ref",
     "evaluate_by_ref",
     "snapshot_role_snapshot",

@@ -3,6 +3,7 @@ from __future__ import annotations
 from homunculus.role_snapshot import (
     RoleSnapshot,
     act_by_ref,
+    drag_by_ref,
     extract_text_by_ref,
     evaluate_by_ref,
     snapshot_role_snapshot,
@@ -76,6 +77,29 @@ def snapshot_then_extract_text_by_ref(
     return snapshot, text
 
 
+def snapshot_then_drag_by_ref(
+    page,
+    start_ref: str,
+    end_ref: str,
+    timeout_ms: int | None = None,
+    include_roles: set[str] | None = None,
+    visible_only: bool = True,
+) -> RoleSnapshot:
+    """Snapshot role refs, validate presence, then drag between refs."""
+    snapshot = snapshot_role_snapshot(
+        page,
+        include_roles=include_roles,
+        visible_only=visible_only,
+    )
+    if start_ref not in snapshot.ref_to_role_ref:
+        raise ValueError(f"Ref not found in snapshot: {start_ref}")
+    if end_ref not in snapshot.ref_to_role_ref:
+        raise ValueError(f"Ref not found in snapshot: {end_ref}")
+
+    drag_by_ref(page, snapshot, start_ref, end_ref, timeout_ms)
+    return snapshot
+
+
 def snapshot_then_evaluate_by_ref(
     page,
     ref: str,
@@ -102,6 +126,7 @@ def snapshot_then_evaluate_by_ref(
 
 __all__ = [
     "snapshot_then_act_by_ref",
+    "snapshot_then_drag_by_ref",
     "snapshot_then_extract_text_by_ref",
     "snapshot_then_evaluate_by_ref",
 ]

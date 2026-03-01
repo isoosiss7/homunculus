@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Drag Drop Fixture</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 16px;
+    }
+    #drag-source,
+    #drop-target {
+      border: 2px dashed #444;
+      border-radius: 6px;
+      display: inline-block;
+      margin-right: 16px;
+      padding: 12px 16px;
+      user-select: none;
+    }
+    #drop-target {
+      border-style: solid;
+    }
+    #result {
+      margin-top: 16px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="drag-source" role="button" aria-label="Drag source" draggable="true">
+    Drag me
+  </div>
+  <div id="drop-target" role="button" aria-label="Drop target">
+    Drop here
+  </div>
+  <div id="result"></div>
+  <script>
+    const source = document.getElementById("drag-source");
+    const target = document.getElementById("drop-target");
+    const result = document.getElementById("result");
+
+    source.addEventListener("dragstart", (event) => {
+      event.dataTransfer.setData("text/plain", "payload");
+    });
+
+    target.addEventListener("dragover", (event) => {
+      event.preventDefault();
+    });
+
+    target.addEventListener("drop", (event) => {
+      event.preventDefault();
+      const payload = event.dataTransfer.getData("text/plain");
+      result.textContent = `dropped:${payload}`;
+    });
+  </script>
+</body>
+</html>

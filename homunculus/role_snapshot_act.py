@@ -25,12 +25,14 @@ def snapshot_then_act_by_ref(
     double_click: bool | None = None,
     include_roles: set[str] | None = None,
     visible_only: bool = True,
+    selector: str | None = None,
 ) -> RoleSnapshot:
     """Snapshot role refs, validate presence, then perform an action."""
     snapshot = snapshot_role_snapshot(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=selector,
     )
 
     if ref not in snapshot.ref_to_role_ref:
@@ -62,12 +64,14 @@ def snapshot_then_extract_text_by_ref(
     visible_only: bool = True,
     timeout_ms: int | None = None,
     state: str | None = None,
+    selector: str | None = None,
 ) -> tuple[RoleSnapshot, str]:
     """Snapshot role refs, then extract visible text."""
     snapshot = snapshot_role_snapshot(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=selector,
     )
     if ref not in snapshot.ref_to_role_ref:
         if timeout_ms is None:
@@ -85,12 +89,14 @@ def snapshot_then_drag_by_ref(
     timeout_ms: int | None = None,
     include_roles: set[str] | None = None,
     visible_only: bool = True,
+    selector: str | None = None,
 ) -> RoleSnapshot:
     """Snapshot role refs, validate presence, then drag between refs."""
     snapshot = snapshot_role_snapshot(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=selector,
     )
     if start_ref not in snapshot.ref_to_role_ref:
         raise ValueError(f"Ref not found in snapshot: {start_ref}")
@@ -109,12 +115,14 @@ def snapshot_then_evaluate_by_ref(
     visible_only: bool = True,
     timeout_ms: int | None = None,
     state: str | None = None,
+    selector: str | None = None,
 ) -> tuple[RoleSnapshot, object]:
     """Snapshot role refs, then evaluate against the referenced element."""
     snapshot = snapshot_role_snapshot(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=selector,
     )
     if ref not in snapshot.ref_to_role_ref:
         if timeout_ms is None:
@@ -128,6 +136,7 @@ def snapshot_then_evaluate_by_ref(
 def snapshot_then_wait(
     page,
     *,
+    snapshot_selector: str | None = None,
     selector: str | None = None,
     url: str | None = None,
     load: str | None = None,
@@ -143,6 +152,7 @@ def snapshot_then_wait(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=snapshot_selector,
     )
     wait_for(
         page,

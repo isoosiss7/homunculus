@@ -6,7 +6,10 @@ DEFAULT_INCLUDE_ROLES = {"button", "textbox", "link", "checkbox", "radio", "comb
 
 
 def snapshot_role_refs(
-    page, include_roles: set[str] | None = None, visible_only: bool = True
+    page,
+    include_roles: set[str] | None = None,
+    visible_only: bool = True,
+    selector: str | None = None,
 ) -> list[str]:
     roles = include_roles or DEFAULT_INCLUDE_ROLES
     role_refs: list[str] = []
@@ -60,8 +63,9 @@ def snapshot_role_refs(
 }
 """
 
+    scope = page.locator(selector) if selector else page
     for role in sorted(roles):
-        locator = page.get_by_role(role, include_hidden=True)
+        locator = scope.get_by_role(role, include_hidden=True)
         try:
             count = locator.count()
         except Exception:

@@ -18,11 +18,13 @@ class BrowserPrimitives:
         self,
         include_roles: set[str] | None = None,
         visible_only: bool = True,
+        selector: str | None = None,
     ) -> RoleSnapshot:
         return snapshot_role_snapshot(
             self._page,
             include_roles=include_roles,
             visible_only=visible_only,
+            selector=selector,
         )
 
     def act(
@@ -39,6 +41,7 @@ class BrowserPrimitives:
         double_click: bool | None = None,
         include_roles: set[str] | None = None,
         visible_only: bool = True,
+        selector: str | None = None,
     ) -> RoleSnapshot:
         return snapshot_then_act_by_ref(
             self._page,
@@ -54,6 +57,7 @@ class BrowserPrimitives:
             double_click=double_click,
             include_roles=include_roles,
             visible_only=visible_only,
+            selector=selector,
         )
 
     def drag(
@@ -63,6 +67,7 @@ class BrowserPrimitives:
         timeout_ms: int | None = None,
         include_roles: set[str] | None = None,
         visible_only: bool = True,
+        selector: str | None = None,
     ) -> RoleSnapshot:
         return snapshot_then_drag_by_ref(
             self._page,
@@ -71,6 +76,7 @@ class BrowserPrimitives:
             timeout_ms=timeout_ms,
             include_roles=include_roles,
             visible_only=visible_only,
+            selector=selector,
         )
 
     def extract_text(
@@ -80,6 +86,7 @@ class BrowserPrimitives:
         visible_only: bool = True,
         timeout_ms: int | None = None,
         state: str | None = None,
+        selector: str | None = None,
     ) -> tuple[RoleSnapshot, str]:
         return snapshot_then_extract_text_by_ref(
             self._page,
@@ -88,6 +95,7 @@ class BrowserPrimitives:
             visible_only=visible_only,
             timeout_ms=timeout_ms,
             state=state,
+            selector=selector,
         )
 
     def evaluate(
@@ -98,6 +106,7 @@ class BrowserPrimitives:
         visible_only: bool = True,
         timeout_ms: int | None = None,
         state: str | None = None,
+        selector: str | None = None,
     ) -> tuple[RoleSnapshot, object]:
         return snapshot_then_evaluate_by_ref(
             self._page,
@@ -107,10 +116,12 @@ class BrowserPrimitives:
             visible_only=visible_only,
             timeout_ms=timeout_ms,
             state=state,
+            selector=selector,
         )
 
     def wait(
         self,
+        snapshot_selector: str | None = None,
         selector: str | None = None,
         url: str | None = None,
         load: str | None = None,
@@ -123,6 +134,7 @@ class BrowserPrimitives:
     ) -> RoleSnapshot:
         return snapshot_then_wait(
             self._page,
+            snapshot_selector=snapshot_selector,
             selector=selector,
             url=url,
             load=load,

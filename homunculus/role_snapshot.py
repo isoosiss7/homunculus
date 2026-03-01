@@ -37,11 +37,13 @@ def snapshot_role_snapshot(
     page,
     include_roles: set[str] | None = None,
     visible_only: bool = True,
+    selector: str | None = None,
 ) -> RoleSnapshot:
     role_refs = snapshot_role_refs(
         page,
         include_roles=include_roles,
         visible_only=visible_only,
+        selector=selector,
     )
     parsed: list[tuple[str, str, int, str]] = []
     for role_ref_str in role_refs:

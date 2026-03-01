@@ -18,13 +18,16 @@ def snapshot_then_act_by_role_ref(
     button: str | None = None,
     double_click: bool | None = None,
     include_roles: set[str] | None = None,
+    selector: str | None = None,
 ) -> None:
     """Snapshot role refs, validate presence, then perform an action."""
     # For most actions, we validate the target exists in the current snapshot.
     # For action=wait, the element may legitimately be missing (e.g. waiting for
     # a delayed element to appear), so we skip strict snapshot validation.
     if action != "wait":
-        role_refs = snapshot_role_refs(page, include_roles=include_roles)
+        role_refs = snapshot_role_refs(
+            page, include_roles=include_roles, selector=selector
+        )
         if role_ref_str not in role_refs:
             raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
 
@@ -49,6 +52,7 @@ def snapshot_then_extract_text_by_role_ref(
     include_roles: set[str] | None = None,
     timeout_ms: int | None = None,
     state: str | None = None,
+    selector: str | None = None,
 ) -> str:
     """Snapshot role refs, then extract visible text.
 
@@ -56,7 +60,7 @@ def snapshot_then_extract_text_by_role_ref(
     for delayed elements it's reasonable to allow waiting when a timeout was
     provided.
     """
-    role_refs = snapshot_role_refs(page, include_roles=include_roles)
+    role_refs = snapshot_role_refs(page, include_roles=include_roles, selector=selector)
     if role_ref_str not in role_refs:
         if timeout_ms is None:
             raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
@@ -72,9 +76,10 @@ def snapshot_then_evaluate_by_role_ref(
     include_roles: set[str] | None = None,
     timeout_ms: int | None = None,
     state: str | None = None,
+    selector: str | None = None,
 ) -> object:
     """Snapshot role refs, then evaluate against the referenced element."""
-    role_refs = snapshot_role_refs(page, include_roles=include_roles)
+    role_refs = snapshot_role_refs(page, include_roles=include_roles, selector=selector)
     if role_ref_str not in role_refs:
         if timeout_ms is None:
             raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")

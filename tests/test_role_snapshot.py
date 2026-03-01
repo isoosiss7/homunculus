@@ -68,3 +68,39 @@ def test_act_by_ref_rejects_unknown_ref() -> None:
         finally:
             context.close()
             browser.close()
+
+
+def test_snapshot_role_snapshot_scoped_by_selector() -> None:
+    html = """
+    <div id="left">
+      <button>Save</button>
+      <input aria-label="Name" />
+    </div>
+    <div id="right">
+      <button>Save</button>
+      <input aria-label="Name" />
+    </div>
+    """
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            snapshot = snapshot_role_snapshot(page, selector="#left")
+
+            expected_role_refs = [
+                RoleRef(role="button", name="Save", nth=0).to_str(),
+                RoleRef(role="textbox", name="Name", nth=0).to_str(),
+            ]
+            assert [item.role_ref for item in snapshot.items] == expected_role_refs
+            assert snapshot.stats["count"] == len(expected_role_refs)
+        finally:
+            context.close()
+            browser.close()

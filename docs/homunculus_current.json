@@ -1,12 +1,12 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T07:24:19.814031+00:00",
-  "last_milestone": "Added BrowserPrimitives.drag(start_ref, end_ref) + unit test",
-  "last_milestone_at": "2026-03-01T07:25:33.693894+00:00",
+  "last_heartbeat_at": "2026-03-01T07:41:25.027650+00:00",
+  "last_milestone": "selector-scoped role snapshots (snapshot_role_refs selector + plumbed through primitives)",
+  "last_milestone_at": "2026-03-01T07:43:36.850147+00:00",
   "needs_human": false,
-  "run_id": "a7b5c15a366e414eb5b0d9dc1e0efd1d",
-  "started_at": "2026-03-01T07:24:19.813707+00:00",
+  "run_id": "6a12831c9f964ecbb810268f89d497f7",
+  "started_at": "2026-03-01T07:41:25.027218+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

@@ -134,6 +134,30 @@ def test_act_by_role_ref_press() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_hover() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="button", name="Hover target", nth=0).to_str()
+            act_by_role_ref(page, role_ref_str, action="hover")
+
+            assert page.text_content("#result") == "hovered"
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_unsupported_action() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
     html = fixture_path.read_text(encoding="utf-8")
@@ -150,8 +174,11 @@ def test_act_by_role_ref_unsupported_action() -> None:
             page.set_content(html, wait_until="domcontentloaded")
 
             role_ref_str = RoleRef(role="button", name="Submit", nth=0).to_str()
-            with pytest.raises(ValueError, match="Unsupported action"):
-                act_by_role_ref(page, role_ref_str, action="hover")
+            with pytest.raises(
+                ValueError,
+                match="Unsupported action 'focus'. Supported actions: click, fill, press, hover.",
+            ):
+                act_by_role_ref(page, role_ref_str, action="focus")
         finally:
             context.close()
             browser.close()

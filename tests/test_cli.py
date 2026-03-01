@@ -217,6 +217,32 @@ def test_cli_act_by_role_ref_press_print_title() -> None:
     assert "pressed-enter" in result.stdout
 
 
+def test_cli_act_by_role_ref_hover_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Hover target", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "hover",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "hovered" in result.stdout
+
+
 def test_cli_snapshot_act_click_print_title() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"

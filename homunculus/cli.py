@@ -53,7 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     act_parser.add_argument("role_ref", help="Role ref string to act on")
     act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press"],
+        choices=["click", "fill", "press", "hover"],
         required=True,
         help="Action to perform",
     )
@@ -87,7 +87,7 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_act_parser.add_argument("role_ref", help="Role ref string to act on")
     snapshot_act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press"],
+        choices=["click", "fill", "press", "hover"],
         required=True,
         help="Action to perform",
     )
@@ -137,7 +137,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     act_role_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press"],
+        choices=["click", "fill", "press", "hover"],
         required=True,
         help="Action to perform",
     )

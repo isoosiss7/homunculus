@@ -115,7 +115,12 @@ def _run_maps_midterm(intent: MapsMidtermIntent, run_id: str) -> Done:
 
             results = []
             for place_name in places:
-                eta = get_driving_eta(page, intent.origin, place_name)
+                eta_page = context.new_page()
+                try:
+                    open_google_maps(eta_page)
+                    eta = get_driving_eta(eta_page, intent.origin, place_name)
+                finally:
+                    eta_page.close()
                 results.append({"name": place_name, "eta": eta})
         except Exception as exc:
             _capture_maps_failure(page, run_id, exc)

@@ -6,8 +6,8 @@ from playwright.sync_api import expect, sync_playwright
 
 from homunculus.playwright_utils import launch_chromium, new_anonymous_context
 from tests.gmaps_helpers import (
-    get_top_place_results,
     get_driving_eta,
+    get_top_place_results,
     locate_results_panel,
     open_google_maps,
     search_location,

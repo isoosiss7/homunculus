@@ -10,8 +10,8 @@ from homunculus.role_ref import RoleRef
 from homunculus.role_snapshot import snapshot_role_snapshot
 from homunculus.role_snapshot_act import (
     snapshot_then_act_by_ref,
-    snapshot_then_extract_text_by_ref,
     snapshot_then_evaluate_by_ref,
+    snapshot_then_extract_text_by_ref,
 )
 
 
@@ -40,9 +40,7 @@ def test_snapshot_then_act_by_ref_click() -> None:
                 name="Submit",
                 nth=1,
             ).to_str()
-            ref = next(
-                item.ref for item in snapshot.items if item.role_ref == target_role_ref
-            )
+            ref = next(item.ref for item in snapshot.items if item.role_ref == target_role_ref)
 
             snapshot_then_act_by_ref(page, ref, action="click")
 
@@ -100,9 +98,7 @@ def test_snapshot_then_extract_text_by_ref_missing_ref_timeout() -> None:
             pytest.skip(f"Playwright browsers not installed: {exc}")
 
         try:
-            snapshot, text = snapshot_then_extract_text_by_ref(
-                page, "e999", timeout_ms=100
-            )
+            snapshot, text = snapshot_then_extract_text_by_ref(page, "e999", timeout_ms=100)
 
             assert snapshot.stats["count"] > 0
             assert text == ""
@@ -124,13 +120,9 @@ def test_snapshot_then_evaluate_by_ref_text_content() -> None:
         try:
             snapshot = snapshot_role_snapshot(page)
             target_role_ref = RoleRef(role="button", name="Submit", nth=0).to_str()
-            ref = next(
-                item.ref for item in snapshot.items if item.role_ref == target_role_ref
-            )
+            ref = next(item.ref for item in snapshot.items if item.role_ref == target_role_ref)
 
-            snapshot, result = snapshot_then_evaluate_by_ref(
-                page, ref, "(el) => el.textContent"
-            )
+            snapshot, result = snapshot_then_evaluate_by_ref(page, ref, "(el) => el.textContent")
 
             assert snapshot.stats["count"] > 0
             assert result == "Submit"

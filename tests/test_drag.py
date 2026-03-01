@@ -56,12 +56,8 @@ def test_snapshot_then_drag_by_ref() -> None:
             snapshot = snapshot_role_snapshot(page)
             start_role_ref = RoleRef(role="button", name="Drag source", nth=0).to_str()
             end_role_ref = RoleRef(role="button", name="Drop target", nth=0).to_str()
-            start_ref = next(
-                item.ref for item in snapshot.items if item.role_ref == start_role_ref
-            )
-            end_ref = next(
-                item.ref for item in snapshot.items if item.role_ref == end_role_ref
-            )
+            start_ref = next(item.ref for item in snapshot.items if item.role_ref == start_role_ref)
+            end_ref = next(item.ref for item in snapshot.items if item.role_ref == end_role_ref)
 
             snapshot_then_drag_by_ref(page, start_ref, end_ref)
 

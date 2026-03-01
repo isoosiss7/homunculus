@@ -16,6 +16,10 @@ from homunculus.browser_wait import wait_for
 from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
 from homunculus.role_snapshot import snapshot_role_snapshot
+from homunculus.role_snapshot_act import (
+    snapshot_then_act_by_ref,
+    snapshot_then_extract_text_by_ref,
+)
 from homunculus.snapshot_act import (
     snapshot_then_act_by_role_ref,
     snapshot_then_extract_text_by_role_ref,
@@ -179,6 +183,66 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use dblclick when action=click",
     )
 
+    snapshot_act_by_ref_parser = subparsers.add_parser(
+        "snapshot-act-by-ref",
+        help="Validate a snapshot ref exists and perform an action on it",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "ref",
+        help="Snapshot ref string to act on (e1, e2, ...)",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--action",
+        choices=["click", "fill", "select", "type", "press", "hover", "wait"],
+        required=True,
+        help="Action to perform",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--value",
+        help="Value to fill when using action=fill, action=type, or action=select",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--key",
+        help="Key to press when using action=press",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--slowly",
+        action="store_true",
+        help="Type with a delay when using action=type",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--print-title",
+        action="store_true",
+        help="Print page title after performing the action",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Action timeout in milliseconds",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--state",
+        help="Target wait state when using action=wait",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--modifiers",
+        action="append",
+        help="Keyboard modifiers for action=click (repeatable)",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--button",
+        help="Mouse button for action=click (e.g. left, right, middle)",
+    )
+    snapshot_act_by_ref_parser.add_argument(
+        "--double-click",
+        action="store_true",
+        help="Use dblclick when action=click",
+    )
+
     snapshot_extract_parser = subparsers.add_parser(
         "snapshot-extract-text",
         help="Validate a role ref exists and extract its visible text",
@@ -203,6 +267,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="Target wait state when extracting",
     )
     snapshot_extract_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print extracted text as JSON",
+    )
+
+    snapshot_extract_by_ref_parser = subparsers.add_parser(
+        "snapshot-extract-text-by-ref",
+        help="Validate a snapshot ref exists and extract its visible text",
+    )
+    snapshot_extract_by_ref_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    snapshot_extract_by_ref_parser.add_argument(
+        "ref",
+        help="Snapshot ref string to extract (e1, e2, ...)",
+    )
+    snapshot_extract_by_ref_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Wait timeout in milliseconds",
+    )
+    snapshot_extract_by_ref_parser.add_argument(
+        "--state",
+        help="Target wait state when extracting",
+    )
+    snapshot_extract_by_ref_parser.add_argument(
         "--json",
         action="store_true",
         help="Print extracted text as JSON",
@@ -411,12 +502,8 @@ def main() -> int:
             parser.error("--state can only be used with action 'wait'")
         if args.slowly and args.action != "type":
             parser.error("--slowly can only be used with action 'type'")
-        if (
-            args.modifiers or args.button or args.double_click
-        ) and args.action != "click":
-            parser.error(
-                "--modifiers/--button/--double-click can only be used with action 'click'"
-            )
+        if (args.modifiers or args.button or args.double_click) and args.action != "click":
+            parser.error("--modifiers/--button/--double-click can only be used with action 'click'")
         with _page_for_target(args.target) as page:
             act_by_role_ref(
                 page,
@@ -448,17 +535,51 @@ def main() -> int:
             parser.error("--state can only be used with action 'wait'")
         if args.slowly and args.action != "type":
             parser.error("--slowly can only be used with action 'type'")
-        if (
-            args.modifiers or args.button or args.double_click
-        ) and args.action != "click":
-            parser.error(
-                "--modifiers/--button/--double-click can only be used with action 'click'"
-            )
+        if (args.modifiers or args.button or args.double_click) and args.action != "click":
+            parser.error("--modifiers/--button/--double-click can only be used with action 'click'")
         with _page_for_target(args.target) as page:
             try:
                 snapshot_then_act_by_role_ref(
                     page,
                     args.role_ref,
+                    args.action,
+                    args.value,
+                    args.key,
+                    args.timeout_ms,
+                    args.state,
+                    args.slowly,
+                    args.modifiers,
+                    args.button,
+                    args.double_click,
+                    include_roles=None,
+                )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            if args.print_title:
+                print(page.title())
+        return 0
+
+    if args.command == "snapshot-act-by-ref":
+        if args.action == "fill" and args.value is None:
+            parser.error("action 'fill' requires --value")
+        if args.action == "select" and args.value is None:
+            parser.error("action 'select' requires --value")
+        if args.action == "type" and args.value is None:
+            parser.error("action 'type' requires --value")
+        if args.action == "press" and args.key is None:
+            parser.error("action 'press' requires --key")
+        if args.state is not None and args.action != "wait":
+            parser.error("--state can only be used with action 'wait'")
+        if args.slowly and args.action != "type":
+            parser.error("--slowly can only be used with action 'type'")
+        if (args.modifiers or args.button or args.double_click) and args.action != "click":
+            parser.error("--modifiers/--button/--double-click can only be used with action 'click'")
+        with _page_for_target(args.target) as page:
+            try:
+                snapshot_then_act_by_ref(
+                    page,
+                    args.ref,
                     args.action,
                     args.value,
                     args.key,
@@ -504,6 +625,24 @@ def main() -> int:
             print(text)
         return 0
 
+    if args.command == "snapshot-extract-text-by-ref":
+        with _page_for_target(args.target) as page:
+            try:
+                _, text = snapshot_then_extract_text_by_ref(
+                    page,
+                    args.ref,
+                    timeout_ms=args.timeout_ms,
+                    state=args.state,
+                )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        if args.json:
+            print(json.dumps({"text": text, "ref": args.ref}))
+        else:
+            print(text)
+        return 0
+
     if args.command in {"act", "act-by-role"}:
         if args.action == "fill" and args.value is None:
             parser.error("action 'fill' requires --value")
@@ -517,12 +656,8 @@ def main() -> int:
             parser.error("--state can only be used with action 'wait'")
         if args.slowly and args.action != "type":
             parser.error("--slowly can only be used with action 'type'")
-        if (
-            args.modifiers or args.button or args.double_click
-        ) and args.action != "click":
-            parser.error(
-                "--modifiers/--button/--double-click can only be used with action 'click'"
-            )
+        if (args.modifiers or args.button or args.double_click) and args.action != "click":
+            parser.error("--modifiers/--button/--double-click can only be used with action 'click'")
         role_ref = RoleRef(role=args.role, name=args.name, nth=args.nth).to_str()
         with _page_for_target(args.target) as page:
             act_by_role_ref(

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import fnmatch
 import time
 from typing import Optional
 
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
-
-import fnmatch
 
 _VALID_LOAD_STATES = {"load", "domcontentloaded", "networkidle", "commit"}
 
@@ -32,9 +31,7 @@ def wait_for(
         raise ValueError("At least one wait condition must be provided.")
     if load is not None and load not in _VALID_LOAD_STATES:
         raise ValueError(
-            "Invalid load state. Expected one of: "
-            + ", ".join(sorted(_VALID_LOAD_STATES))
-            + "."
+            "Invalid load state. Expected one of: " + ", ".join(sorted(_VALID_LOAD_STATES)) + "."
         )
 
     start = time.monotonic()

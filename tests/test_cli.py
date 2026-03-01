@@ -9,7 +9,9 @@ import pytest
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
+from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
+from homunculus.role_snapshot import snapshot_role_snapshot
 
 
 def _ensure_playwright_available() -> None:
@@ -20,6 +22,24 @@ def _ensure_playwright_available() -> None:
             pytest.skip(f"Playwright browsers not installed: {exc}")
         else:
             browser.close()
+
+
+def _snapshot_ref_for_role_ref(fixture_path: Path, role_ref: str) -> str:
+    target_url = fixture_path.resolve().as_uri()
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        context = new_anonymous_context(browser)
+        try:
+            page = context.new_page()
+            page.goto(target_url, wait_until="domcontentloaded")
+            snapshot = snapshot_role_snapshot(page)
+        finally:
+            context.close()
+            browser.close()
+    for item in snapshot.items:
+        if item.role_ref == role_ref:
+            return item.ref
+    raise AssertionError(f"Snapshot ref not found for role ref: {role_ref}")
 
 
 def test_cli_run_outputs_done() -> None:
@@ -538,6 +558,33 @@ def test_cli_snapshot_act_missing_role_ref() -> None:
     assert "not found" in result.stderr.lower()
 
 
+def test_cli_snapshot_act_by_ref_click_print_title() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Submit", nth=1).to_str()
+    ref = _snapshot_ref_for_role_ref(fixture_path, role_ref)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-act-by-ref",
+            str(fixture_path),
+            ref,
+            "--action",
+            "click",
+            "--print-title",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "clicked-1" in result.stdout
+
+
 def test_cli_snapshot_extract_text() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
@@ -551,6 +598,30 @@ def test_cli_snapshot_extract_text() -> None:
             "snapshot-extract-text",
             str(fixture_path),
             role_ref,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout.strip() == "Submit"
+
+
+def test_cli_snapshot_extract_text_by_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Submit", nth=0).to_str()
+    ref = _snapshot_ref_for_role_ref(fixture_path, role_ref)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-extract-text-by-ref",
+            str(fixture_path),
+            ref,
         ],
         check=False,
         capture_output=True,
@@ -624,6 +695,28 @@ def test_cli_snapshot_extract_text_missing_role_ref() -> None:
             "snapshot-extract-text",
             str(fixture_path),
             role_ref,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "not found" in result.stderr.lower()
+
+
+def test_cli_snapshot_extract_text_by_ref_missing_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-extract-text-by-ref",
+            str(fixture_path),
+            "e9999",
         ],
         check=False,
         capture_output=True,

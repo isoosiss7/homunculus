@@ -70,15 +70,11 @@ def test_open_google_maps_waits_for_role_search_box(monkeypatch) -> None:
     assert page.goto_calls == [("https://www.google.com/maps", "domcontentloaded")]
     assert page.reload_calls == []
     assert any(
-        role == "combobox"
-        and hasattr(name, "pattern")
-        and name.pattern == r"search"
+        role == "combobox" and hasattr(name, "pattern") and name.pattern == r"search"
         for role, name in page.role_calls
     )
     assert any(
-        role == "textbox"
-        and hasattr(name, "pattern")
-        and name.pattern == r"search"
+        role == "textbox" and hasattr(name, "pattern") and name.pattern == r"search"
         for role, name in page.role_calls
     )
     assert combobox.wait_for_calls

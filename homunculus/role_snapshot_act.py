@@ -4,8 +4,8 @@ from homunculus.role_snapshot import (
     RoleSnapshot,
     act_by_ref,
     drag_by_ref,
-    extract_text_by_ref,
     evaluate_by_ref,
+    extract_text_by_ref,
     snapshot_role_snapshot,
 )
 

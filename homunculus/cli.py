@@ -56,17 +56,22 @@ def build_parser() -> argparse.ArgumentParser:
     act_parser.add_argument("role_ref", help="Role ref string to act on")
     act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover", "wait"],
+        choices=["click", "fill", "type", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
     act_parser.add_argument(
         "--value",
-        help="Value to fill when using action=fill",
+        help="Value to fill when using action=fill or action=type",
     )
     act_parser.add_argument(
         "--key",
         help="Key to press when using action=press",
+    )
+    act_parser.add_argument(
+        "--slowly",
+        action="store_true",
+        help="Type with a delay when using action=type",
     )
     act_parser.add_argument(
         "--print-title",
@@ -94,17 +99,22 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_act_parser.add_argument("role_ref", help="Role ref string to act on")
     snapshot_act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover", "wait"],
+        choices=["click", "fill", "type", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
     snapshot_act_parser.add_argument(
         "--value",
-        help="Value to fill when using action=fill",
+        help="Value to fill when using action=fill or action=type",
     )
     snapshot_act_parser.add_argument(
         "--key",
         help="Key to press when using action=press",
+    )
+    snapshot_act_parser.add_argument(
+        "--slowly",
+        action="store_true",
+        help="Type with a delay when using action=type",
     )
     snapshot_act_parser.add_argument(
         "--print-title",
@@ -177,17 +187,22 @@ def build_parser() -> argparse.ArgumentParser:
     )
     act_role_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover", "wait"],
+        choices=["click", "fill", "type", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
     act_role_parser.add_argument(
         "--value",
-        help="Value to fill when using action=fill",
+        help="Value to fill when using action=fill or action=type",
     )
     act_role_parser.add_argument(
         "--key",
         help="Key to press when using action=press",
+    )
+    act_role_parser.add_argument(
+        "--slowly",
+        action="store_true",
+        help="Type with a delay when using action=type",
     )
     act_role_parser.add_argument(
         "--print-title",
@@ -262,10 +277,14 @@ def main() -> int:
     if args.command == "act-by-role-ref":
         if args.action == "fill" and args.value is None:
             parser.error("action 'fill' requires --value")
+        if args.action == "type" and args.value is None:
+            parser.error("action 'type' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         if args.state is not None and args.action != "wait":
             parser.error("--state can only be used with action 'wait'")
+        if args.slowly and args.action != "type":
+            parser.error("--slowly can only be used with action 'type'")
         with _page_for_target(args.target) as page:
             act_by_role_ref(
                 page,
@@ -275,6 +294,7 @@ def main() -> int:
                 args.key,
                 args.timeout_ms,
                 args.state,
+                args.slowly,
             )
             if args.print_title:
                 print(page.title())
@@ -283,10 +303,14 @@ def main() -> int:
     if args.command == "snapshot-act":
         if args.action == "fill" and args.value is None:
             parser.error("action 'fill' requires --value")
+        if args.action == "type" and args.value is None:
+            parser.error("action 'type' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         if args.state is not None and args.action != "wait":
             parser.error("--state can only be used with action 'wait'")
+        if args.slowly and args.action != "type":
+            parser.error("--slowly can only be used with action 'type'")
         with _page_for_target(args.target) as page:
             try:
                 snapshot_then_act_by_role_ref(
@@ -297,6 +321,7 @@ def main() -> int:
                     args.key,
                     args.timeout_ms,
                     args.state,
+                    args.slowly,
                     include_roles=None,
                 )
             except ValueError as exc:
@@ -336,10 +361,14 @@ def main() -> int:
     if args.command in {"act", "act-by-role"}:
         if args.action == "fill" and args.value is None:
             parser.error("action 'fill' requires --value")
+        if args.action == "type" and args.value is None:
+            parser.error("action 'type' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
         if args.state is not None and args.action != "wait":
             parser.error("--state can only be used with action 'wait'")
+        if args.slowly and args.action != "type":
+            parser.error("--slowly can only be used with action 'type'")
         role_ref = RoleRef(role=args.role, name=args.name, nth=args.nth).to_str()
         with _page_for_target(args.target) as page:
             act_by_role_ref(
@@ -350,6 +379,7 @@ def main() -> int:
                 args.key,
                 args.timeout_ms,
                 args.state,
+                args.slowly,
             )
             if args.print_title:
                 print(page.title())

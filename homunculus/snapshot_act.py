@@ -12,6 +12,7 @@ def snapshot_then_act_by_role_ref(
     key: str | None = None,
     timeout_ms: int | None = None,
     state: str | None = None,
+    slowly: bool | None = None,
     include_roles: set[str] | None = None,
 ) -> None:
     """Snapshot role refs, validate presence, then perform an action."""
@@ -23,7 +24,16 @@ def snapshot_then_act_by_role_ref(
         if role_ref_str not in role_refs:
             raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
 
-    act_by_role_ref(page, role_ref_str, action, value, key, timeout_ms, state)
+    act_by_role_ref(
+        page,
+        role_ref_str,
+        action,
+        value,
+        key,
+        timeout_ms,
+        state,
+        slowly,
+    )
 
 
 def snapshot_then_extract_text_by_role_ref(

@@ -35,7 +35,7 @@ def test_wait_for_selector_with_delayed_element():
         browser.close()
 
 
-def test_wait_for_url_after_history_push():
+def test_wait_for_url_after_history_change():
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "browser_wait.html"
     with sync_playwright() as playwright:
@@ -49,15 +49,17 @@ def test_wait_for_url_after_history_push():
             """
             () => {
                 setTimeout(() => {
-                    history.pushState({}, '', 'next');
+                    // history.pushState() is blocked on file:// (origin 'null'); use a
+                    // hash change to validate URL waiting behavior in this fixture.
+                    location.hash = 'next';
                 }, 50);
             }
             """
         )
 
-        wait_for(page, url="**/next", timeout_ms=1000)
+        wait_for(page, url="**#next", timeout_ms=1000)
 
-        assert page.url.endswith("/next")
+        assert page.url.endswith("#next")
         browser.close()
 
 

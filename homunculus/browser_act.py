@@ -12,6 +12,7 @@ def act_by_role_ref(
     key: str | None = None,
     timeout_ms: int | None = None,
     state: str | None = None,
+    slowly: bool | None = None,
 ) -> None:
     """Perform an action on an element addressed by a role ref string."""
     role_ref = RoleRef.from_str(role_ref_str)
@@ -28,6 +29,15 @@ def act_by_role_ref(
         if value is None:
             raise ValueError("action 'fill' requires a value to be provided")
         locator.fill(value, **action_options)
+        return
+
+    if action == "type":
+        if value is None:
+            raise ValueError("action 'type' requires a value to be provided")
+        type_options = dict(action_options)
+        if slowly:
+            type_options["delay"] = 50
+        locator.type(value, **type_options)
         return
 
     if action == "press":
@@ -50,7 +60,7 @@ def act_by_role_ref(
 
     raise ValueError(
         "Unsupported action"
-        f" '{action}'. Supported actions: click, fill, press, hover, wait."
+        f" '{action}'. Supported actions: click, fill, type, press, hover, wait."
     )
 
 

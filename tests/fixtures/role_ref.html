@@ -34,6 +34,8 @@
       oninput="setResult(this.value)"
       onkeydown="handleUsernameKeydown(event)"
     />
+    <label for="typing">Typing target</label>
+    <input id="typing" type="text" oninput="setResult(this.value)" />
     <button type="button" onclick="setResult('clicked-0')">Submit</button>
     <button type="button" onclick="setResult('clicked-1')">Submit</button>
     <button type="button" onmouseover="setResult('hovered')">Hover target</button>

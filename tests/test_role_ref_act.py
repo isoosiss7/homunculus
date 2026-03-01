@@ -110,6 +110,30 @@ def test_act_by_role_ref_fill() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_type() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="textbox", name="Typing target", nth=0).to_str()
+            act_by_role_ref(page, role_ref_str, action="type", value="Grace")
+
+            assert page.text_content("#result") == "Grace"
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_press() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
     html = fixture_path.read_text(encoding="utf-8")
@@ -200,7 +224,10 @@ def test_act_by_role_ref_unsupported_action() -> None:
             role_ref_str = RoleRef(role="button", name="Submit", nth=0).to_str()
             with pytest.raises(
                 ValueError,
-                match="Unsupported action 'focus'. Supported actions: click, fill, press, hover, wait.",
+                match=(
+                    "Unsupported action 'focus'. Supported actions: click, fill, "
+                    "type, press, hover, wait."
+                ),
             ):
                 act_by_role_ref(page, role_ref_str, action="focus")
         finally:

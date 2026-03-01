@@ -1,8 +1,15 @@
 """Helpers for Playwright usage in Homunculus."""
 
+import subprocess
+import sys
 
-def launch_chromium(playwright, headless: bool = True):
-    """Launch a Chromium browser with sensible defaults."""
+
+def _is_missing_executable_error(error: Exception) -> bool:
+    message = str(error).lower()
+    return "executable doesn't exist" in message or "playwright install" in message
+
+
+def _launch_chromium(playwright, headless: bool):
     return playwright.chromium.launch(
         headless=headless,
         args=[
@@ -10,6 +17,21 @@ def launch_chromium(playwright, headless: bool = True):
             "--disable-infobars",
         ],
     )
+
+
+def launch_chromium(playwright, headless: bool = True):
+    """Launch a Chromium browser with sensible defaults."""
+    try:
+        return _launch_chromium(playwright, headless)
+    except Exception as exc:
+        if not _is_missing_executable_error(exc):
+            raise
+
+        subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            check=True,
+        )
+        return _launch_chromium(playwright, headless)
 
 
 def new_anonymous_context(browser):

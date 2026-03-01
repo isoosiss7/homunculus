@@ -36,6 +36,12 @@
     />
     <label for="typing">Typing target</label>
     <input id="typing" type="text" oninput="setResult(this.value)" />
+    <label for="assistant">Assistant</label>
+    <select id="assistant" onchange="setResult(this.value)">
+      <option value="">Choose one</option>
+      <option value="ada">Ada Lovelace</option>
+      <option value="grace">Grace Hopper</option>
+    </select>
     <button type="button" onclick="setResult('clicked-0')">Submit</button>
     <button type="button" onclick="setResult('clicked-1')">Submit</button>
     <button type="button" style="display: none">Hidden Submit</button>

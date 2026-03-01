@@ -31,6 +31,15 @@ def act_by_role_ref(
         locator.fill(value, **action_options)
         return
 
+    if action == "select":
+        if value is None:
+            raise ValueError("action 'select' requires a value to be provided")
+        try:
+            locator.select_option(label=value, **action_options)
+        except Exception:
+            locator.select_option(value=value, **action_options)
+        return
+
     if action == "type":
         if value is None:
             raise ValueError("action 'type' requires a value to be provided")
@@ -60,7 +69,7 @@ def act_by_role_ref(
 
     raise ValueError(
         "Unsupported action"
-        f" '{action}'. Supported actions: click, fill, type, press, hover, wait."
+        f" '{action}'. Supported actions: click, fill, select, type, press, hover, wait."
     )
 
 

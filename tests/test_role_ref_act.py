@@ -110,6 +110,54 @@ def test_act_by_role_ref_fill() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_select_by_label() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="combobox", name="Assistant", nth=0).to_str()
+            act_by_role_ref(page, role_ref_str, action="select", value="Ada Lovelace")
+
+            assert page.text_content("#result") == "ada"
+        finally:
+            context.close()
+            browser.close()
+
+
+def test_act_by_role_ref_select_by_value() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="combobox", name="Assistant", nth=0).to_str()
+            act_by_role_ref(page, role_ref_str, action="select", value="grace")
+
+            assert page.text_content("#result") == "grace"
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_type() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
     html = fixture_path.read_text(encoding="utf-8")
@@ -226,7 +274,7 @@ def test_act_by_role_ref_unsupported_action() -> None:
                 ValueError,
                 match=(
                     "Unsupported action 'focus'. Supported actions: click, fill, "
-                    "type, press, hover, wait."
+                    "select, type, press, hover, wait."
                 ),
             ):
                 act_by_role_ref(page, role_ref_str, action="focus")

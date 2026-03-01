@@ -1,12 +1,12 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T02:54:24.625097+00:00",
-  "last_milestone": "Add visible_only snapshot option (include_hidden + visibility filter) for role-ref snapshots",
-  "last_milestone_at": "2026-03-01T02:55:37.237772+00:00",
+  "last_heartbeat_at": "2026-03-01T03:10:15.942004+00:00",
+  "last_milestone": "Add role-ref action='select' (label-first with value fallback) + unit tests",
+  "last_milestone_at": "2026-03-01T03:10:15.942004+00:00",
   "needs_human": false,
-  "run_id": "7e47b7f0934345fe927bda61cdd0c72f",
-  "started_at": "2026-03-01T02:54:24.624702+00:00",
+  "run_id": "145e4bce8e674c63bccd074241adfb58",
+  "started_at": "2026-03-01T03:08:11.318139+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

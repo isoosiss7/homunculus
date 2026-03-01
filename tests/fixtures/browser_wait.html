@@ -11,6 +11,10 @@
       #late {
         display: none;
       }
+
+      #text-appear {
+        display: none;
+      }
     </style>
     <script>
       window.delayedFlag = false;
@@ -23,13 +27,25 @@
         window.delayedFlag = true;
       }
 
+      function showText() {
+        document.getElementById("text-appear").style.display = "block";
+      }
+
+      function hideText() {
+        document.getElementById("text-gone").style.display = "none";
+      }
+
       window.addEventListener("DOMContentLoaded", () => {
         setTimeout(showLate, 80);
         setTimeout(setFlag, 140);
+        setTimeout(showText, 90);
+        setTimeout(hideText, 110);
       });
     </script>
   </head>
   <body>
     <button id="late" type="button">Late button</button>
+    <div id="text-appear">Hello from later text</div>
+    <div id="text-gone">Goodbye soon text</div>
   </body>
 </html>

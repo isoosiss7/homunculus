@@ -80,6 +80,41 @@ def test_wait_for_function_on_delayed_window_var():
         browser.close()
 
 
+def test_wait_for_text_to_appear():
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "browser_wait.html"
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+        page = browser.new_page()
+        page.goto(f"file://{fixture_path}")
+
+        wait_for(page, text="Hello from later text", timeout_ms=1000)
+
+        assert page.get_by_text("Hello from later text", exact=False).is_visible()
+        browser.close()
+
+
+def test_wait_for_text_to_disappear():
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "browser_wait.html"
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+        page = browser.new_page()
+        page.goto(f"file://{fixture_path}")
+
+        wait_for(page, text_gone="Goodbye soon text", timeout_ms=1000)
+
+        locator = page.get_by_text("Goodbye soon text", exact=False)
+        assert locator.count() == 0 or locator.is_visible(timeout=0) is False
+        browser.close()
+
+
 def test_combined_waits_share_timeout_budget():
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "browser_wait.html"

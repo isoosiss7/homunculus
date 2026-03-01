@@ -1,12 +1,12 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T03:40:24.536055+00:00",
-  "last_milestone": "Add RoleSnapshot with compact refs (e1..eN) + CLI snapshot-role-snapshot",
-  "last_milestone_at": "2026-03-01T03:44:52.480711+00:00",
+  "last_heartbeat_at": "2026-03-01T03:54:26.801753+00:00",
+  "last_milestone": "browser_wait.wait_for: add text/text_gone conditions",
+  "last_milestone_at": "2026-03-01T03:55:39.851509+00:00",
   "needs_human": false,
-  "run_id": "b0ed760f5ab743babaf91f4b7ebbbe1b",
-  "started_at": "2026-03-01T03:40:24.535725+00:00",
+  "run_id": "5726125b01e1408f8535b255ada0edb3",
+  "started_at": "2026-03-01T03:54:26.801398+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

@@ -98,6 +98,14 @@ def act_by_role_ref(
         locator.hover(**action_options)
         return
 
+    if action == "check":
+        locator.check(**action_options)
+        return
+
+    if action == "uncheck":
+        locator.uncheck(**action_options)
+        return
+
     if action == "wait":
         wait_state = state if state is not None else "visible"
         wait_options: dict[str, str | int] = {"state": wait_state}
@@ -108,7 +116,9 @@ def act_by_role_ref(
 
     raise ValueError(
         "Unsupported action"
-        f" '{action}'. Supported actions: click, fill, select, type, press, hover, wait."
+        " "
+        f"'{action}'. Supported actions: click, fill, select, type, press, hover, "
+        "check, uncheck, wait."
     )
 
 

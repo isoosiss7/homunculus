@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>unchecked</title>
+  </head>
+  <body>
+    <label for="alerts">
+      <input id="alerts" type="checkbox" />
+      Enable alerts
+    </label>
+    <div id="result">unchecked</div>
+    <script>
+      const checkbox = document.getElementById("alerts");
+      const result = document.getElementById("result");
+      const update = () => {
+        const state = checkbox.checked ? "checked" : "unchecked";
+        document.title = state;
+        result.textContent = state;
+      };
+      checkbox.addEventListener("change", update);
+      update();
+    </script>
+  </body>
+</html>

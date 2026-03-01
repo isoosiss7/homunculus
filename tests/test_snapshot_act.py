@@ -55,3 +55,27 @@ def test_snapshot_then_act_by_role_ref_missing_role() -> None:
         finally:
             context.close()
             browser.close()
+
+
+def test_snapshot_then_act_by_role_ref_check() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "checkbox.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="checkbox", name="Enable alerts", nth=0).to_str()
+            snapshot_then_act_by_role_ref(page, role_ref_str, action="check")
+
+            assert page.text_content("#result") == "checked"
+        finally:
+            context.close()
+            browser.close()

@@ -283,6 +283,34 @@ def test_act_by_role_ref_hover() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_check_uncheck() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "checkbox.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="checkbox", name="Enable alerts", nth=0).to_str()
+            act_by_role_ref(page, role_ref_str, action="check")
+
+            assert page.text_content("#result") == "checked"
+
+            act_by_role_ref(page, role_ref_str, action="uncheck")
+
+            assert page.text_content("#result") == "unchecked"
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_wait_visible() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref_wait.html"
     html = fixture_path.read_text(encoding="utf-8")
@@ -327,7 +355,7 @@ def test_act_by_role_ref_unsupported_action() -> None:
                 ValueError,
                 match=(
                     "Unsupported action 'focus'. Supported actions: click, fill, "
-                    "select, type, press, hover, wait."
+                    "select, type, press, hover, check, uncheck, wait."
                 ),
             ):
                 act_by_role_ref(page, role_ref_str, action="focus")

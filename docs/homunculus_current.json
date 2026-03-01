@@ -1,10 +1,20 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T05:27:37.952527+00:00",
+  "last_heartbeat_at": "2026-03-01T06:09:38.886209+00:00",
+  "last_milestone": {
+    "id": "checkbox-check-uncheck",
+    "summary": "Add general checkbox actions (check/uncheck) to act() primitive, plus fixture + unit tests."
+  },
+  "milestone_history": [
+    {
+      "id": "checkbox-check-uncheck",
+      "summary": "Add general checkbox actions (check/uncheck) to act() primitive, plus fixture + unit tests."
+    }
+  ],
   "needs_human": false,
-  "run_id": "9a7f1105da314dd2ada5a0d4ee797a3c",
-  "started_at": "2026-03-01T05:27:37.952124+00:00",
+  "run_id": "e43a3c60103541a6990195100c3e219c",
+  "started_at": "2026-03-01T06:09:38.885676+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

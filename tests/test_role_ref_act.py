@@ -86,6 +86,30 @@ def test_act_by_role_ref_click() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_click_fallback_partial_name() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref_fallback.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="button", name="Submit", nth=0).to_str()
+            act_click_by_role_ref(page, role_ref_str)
+
+            assert page.text_content("#result") == "clicked-fallback"
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_click_with_modifiers() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
     html = fixture_path.read_text(encoding="utf-8")

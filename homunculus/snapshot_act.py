@@ -25,9 +25,7 @@ def snapshot_then_act_by_role_ref(
     # For action=wait, the element may legitimately be missing (e.g. waiting for
     # a delayed element to appear), so we skip strict snapshot validation.
     if action != "wait":
-        role_refs = snapshot_role_refs(
-            page, include_roles=include_roles, selector=selector
-        )
+        role_refs = snapshot_role_refs(page, include_roles=include_roles, selector=selector)
         if role_ref_str not in role_refs:
             raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
 

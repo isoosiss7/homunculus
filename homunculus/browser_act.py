@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from homunculus.role_ref import RoleRef
+from homunculus.role_ref_locator import locator_for_role_ref
 from homunculus.web import extract_text
 
 
@@ -47,7 +48,7 @@ def act_by_role_ref(
 ) -> None:
     """Perform an action on an element addressed by a role ref string."""
     role_ref = RoleRef.from_str(role_ref_str)
-    locator = page.get_by_role(role_ref.role, name=role_ref.name).nth(role_ref.nth)
+    locator = locator_for_role_ref(page, role_ref)
     action_options: dict[str, object] = {}
     if timeout_ms is not None:
         action_options["timeout"] = timeout_ms
@@ -134,7 +135,7 @@ def extract_text_by_role_ref(
 ) -> str:
     """Wait for an element addressed by a role ref string, then extract text."""
     role_ref = RoleRef.from_str(role_ref_str)
-    locator = page.get_by_role(role_ref.role, name=role_ref.name).nth(role_ref.nth)
+    locator = locator_for_role_ref(page, role_ref)
     wait_state = state if state is not None else "visible"
     wait_options: dict[str, str | int] = {"state": wait_state}
     if timeout_ms is not None:
@@ -152,10 +153,8 @@ def drag_by_role_ref(
     """Drag from a role ref source to a role ref target."""
     start_role_ref = RoleRef.from_str(start_role_ref_str)
     end_role_ref = RoleRef.from_str(end_role_ref_str)
-    start_locator = page.get_by_role(start_role_ref.role, name=start_role_ref.name).nth(
-        start_role_ref.nth
-    )
-    end_locator = page.get_by_role(end_role_ref.role, name=end_role_ref.name).nth(end_role_ref.nth)
+    start_locator = locator_for_role_ref(page, start_role_ref)
+    end_locator = locator_for_role_ref(page, end_role_ref)
     drag_options: dict[str, object] = {}
     if timeout_ms is not None:
         drag_options["timeout"] = timeout_ms

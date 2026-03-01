@@ -3,6 +3,7 @@ from __future__ import annotations
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from homunculus.role_ref import RoleRef
+from homunculus.role_ref_locator import locator_for_role_ref
 
 
 def evaluate_page(page, fn: str, timeout_ms: int | None = None) -> object:
@@ -24,7 +25,7 @@ def evaluate_by_role_ref(
 ) -> object:
     """Wait for an element addressed by a role ref string, then evaluate."""
     role_ref = RoleRef.from_str(role_ref_str)
-    locator = page.get_by_role(role_ref.role, name=role_ref.name).nth(role_ref.nth)
+    locator = locator_for_role_ref(page, role_ref)
     wait_state = state if state is not None else "visible"
     wait_options: dict[str, str | int] = {"state": wait_state}
     if timeout_ms is not None:

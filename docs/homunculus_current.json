@@ -1,11 +1,11 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T01:39:00.792899+00:00",
+  "last_heartbeat_at": "2026-03-01T01:55:26.621446+00:00",
   "needs_human": false,
-  "run_id": "fada0acba3784bdf97d6055d80afbc21",
-  "started_at": "2026-03-01T01:39:00.792418+00:00",
+  "run_id": "3ac5d830f00c44ceae8e87cae8dc17ee",
+  "started_at": "2026-03-01T01:54:14.471747+00:00",
   "status": "done",
-  "step_id": "done",
-  "step_name": "Complete"
+  "step_id": "milestone_cli_wait",
+  "step_name": "CLI: add wait action + state flag"
 }

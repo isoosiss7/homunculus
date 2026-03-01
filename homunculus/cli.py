@@ -53,7 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     act_parser.add_argument("role_ref", help="Role ref string to act on")
     act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover"],
+        choices=["click", "fill", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
@@ -74,6 +74,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout-ms",
         type=int,
         help="Action timeout in milliseconds",
+    )
+    act_parser.add_argument(
+        "--state",
+        help="Target wait state when using action=wait",
     )
 
     snapshot_act_parser = subparsers.add_parser(
@@ -87,7 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_act_parser.add_argument("role_ref", help="Role ref string to act on")
     snapshot_act_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover"],
+        choices=["click", "fill", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
@@ -108,6 +112,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout-ms",
         type=int,
         help="Action timeout in milliseconds",
+    )
+    snapshot_act_parser.add_argument(
+        "--state",
+        help="Target wait state when using action=wait",
     )
 
     act_role_parser = subparsers.add_parser(
@@ -137,7 +145,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     act_role_parser.add_argument(
         "--action",
-        choices=["click", "fill", "press", "hover"],
+        choices=["click", "fill", "press", "hover", "wait"],
         required=True,
         help="Action to perform",
     )
@@ -158,6 +166,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout-ms",
         type=int,
         help="Action timeout in milliseconds",
+    )
+    act_role_parser.add_argument(
+        "--state",
+        help="Target wait state when using action=wait",
     )
 
     return parser
@@ -220,6 +232,8 @@ def main() -> int:
             parser.error("action 'fill' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
+        if args.state is not None and args.action != "wait":
+            parser.error("--state can only be used with action 'wait'")
         with _page_for_target(args.target) as page:
             act_by_role_ref(
                 page,
@@ -228,6 +242,7 @@ def main() -> int:
                 args.value,
                 args.key,
                 args.timeout_ms,
+                args.state,
             )
             if args.print_title:
                 print(page.title())
@@ -238,6 +253,8 @@ def main() -> int:
             parser.error("action 'fill' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
+        if args.state is not None and args.action != "wait":
+            parser.error("--state can only be used with action 'wait'")
         with _page_for_target(args.target) as page:
             try:
                 snapshot_then_act_by_role_ref(
@@ -247,6 +264,7 @@ def main() -> int:
                     args.value,
                     args.key,
                     args.timeout_ms,
+                    args.state,
                     include_roles=None,
                 )
             except ValueError as exc:
@@ -261,6 +279,8 @@ def main() -> int:
             parser.error("action 'fill' requires --value")
         if args.action == "press" and args.key is None:
             parser.error("action 'press' requires --key")
+        if args.state is not None and args.action != "wait":
+            parser.error("--state can only be used with action 'wait'")
         role_ref = RoleRef(role=args.role, name=args.name, nth=args.nth).to_str()
         with _page_for_target(args.target) as page:
             act_by_role_ref(
@@ -270,6 +290,7 @@ def main() -> int:
                 args.value,
                 args.key,
                 args.timeout_ms,
+                args.state,
             )
             if args.print_title:
                 print(page.title())

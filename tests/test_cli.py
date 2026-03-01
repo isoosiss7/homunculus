@@ -243,6 +243,32 @@ def test_cli_act_by_role_ref_hover_print_title() -> None:
     assert "hovered" in result.stdout
 
 
+def test_cli_act_by_role_ref_wait() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref_wait.html"
+    role_ref = RoleRef(role="button", name="Delayed button", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "wait",
+            "--timeout-ms",
+            "2000",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+
+
 def test_cli_snapshot_act_click_print_title() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
@@ -267,6 +293,32 @@ def test_cli_snapshot_act_click_print_title() -> None:
 
     assert result.returncode == 0
     assert "clicked-1" in result.stdout
+
+
+def test_cli_snapshot_act_wait() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref_wait.html"
+    role_ref = RoleRef(role="button", name="Delayed button", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-act",
+            str(fixture_path),
+            role_ref,
+            "--action",
+            "wait",
+            "--timeout-ms",
+            "2000",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
 
 
 def test_cli_snapshot_act_missing_role_ref() -> None:
@@ -322,6 +374,34 @@ def test_cli_act_click_print_title() -> None:
 
     assert result.returncode == 0
     assert "clicked-1" in result.stdout
+
+
+def test_cli_act_wait() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref_wait.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "act",
+            str(fixture_path),
+            "--role",
+            "button",
+            "--name",
+            "Delayed button",
+            "--action",
+            "wait",
+            "--timeout-ms",
+            "2000",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
 
 
 def test_cli_act_fill_print_title() -> None:

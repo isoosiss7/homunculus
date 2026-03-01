@@ -15,9 +15,13 @@ def snapshot_then_act_by_role_ref(
     include_roles: set[str] | None = None,
 ) -> None:
     """Snapshot role refs, validate presence, then perform an action."""
-    role_refs = snapshot_role_refs(page, include_roles=include_roles)
-    if role_ref_str not in role_refs:
-        raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
+    # For most actions, we validate the target exists in the current snapshot.
+    # For action=wait, the element may legitimately be missing (e.g. waiting for
+    # a delayed element to appear), so we skip strict snapshot validation.
+    if action != "wait":
+        role_refs = snapshot_role_refs(page, include_roles=include_roles)
+        if role_ref_str not in role_refs:
+            raise ValueError(f"Role ref not found in snapshot: {role_ref_str}")
 
     act_by_role_ref(page, role_ref_str, action, value, key, timeout_ms, state)
 

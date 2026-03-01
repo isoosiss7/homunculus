@@ -3,7 +3,7 @@ from __future__ import annotations
 from html.parser import HTMLParser
 from pathlib import Path
 
-from homunculus.google_maps import (
+from tests.gmaps_helpers import (
     eta_to_minutes,
     find_etas,
     parse_eta,

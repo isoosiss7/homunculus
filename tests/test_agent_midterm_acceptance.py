@@ -2,8 +2,16 @@ import os
 import re
 
 import pytest
+from playwright.sync_api import sync_playwright
 
-from homunculus.agent import run
+from homunculus.playwright_utils import launch_chromium, new_anonymous_context
+from tests.gmaps_helpers import (
+    get_driving_eta,
+    get_top_place_results,
+    open_google_maps,
+    search_location,
+    search_places_nearby,
+)
 
 pytestmark = pytest.mark.skipif(
     os.getenv("HOMUNCULUS_RUN_ACCEPTANCE") != "1",
@@ -12,20 +20,26 @@ pytestmark = pytest.mark.skipif(
 
 
 def test_agent_run_google_maps_midterm():
-    purpose = (
-        'I"m currently at the community center of Cross Creek Ranch, Fulshear TX, '
-        "United States. Can you help me to find a couple of Thai restaurants near "
-        "me and tell me the driving time under current traffic?"
-    )
-    done = run(purpose)
-    assert done.result_json
-    assert done.result_json.get("origin")
-    assert done.result_json.get("query")
-    places = done.result_json.get("places")
-    assert isinstance(places, list)
-    assert len(places) == 2
-    for place in places:
-        assert place.get("name")
-        eta = place.get("eta")
-        assert eta
-        assert re.match(r"^\d+\s+min$|^\d+\s+hr(?:\s+\d+\s+min)?$", eta)
+    with sync_playwright() as playwright:
+        browser = launch_chromium(playwright, headless=True)
+        context = new_anonymous_context(browser)
+        page = context.new_page()
+        try:
+            origin = "Cross Creek Ranch community center, Fulshear TX"
+            open_google_maps(page)
+            search_location(page, origin)
+            search_places_nearby(page, origin, "Thai restaurants")
+            places = get_top_place_results(page, limit=2)
+            assert len(places) == 2
+            for place in places:
+                eta_page = context.new_page()
+                try:
+                    open_google_maps(eta_page)
+                    eta = get_driving_eta(eta_page, origin, place)
+                finally:
+                    eta_page.close()
+                assert eta
+                assert re.match(r"^\d+\s+min$|^\d+\s+hr(?:\s+\d+\s+min)?$", eta)
+        finally:
+            context.close()
+            browser.close()

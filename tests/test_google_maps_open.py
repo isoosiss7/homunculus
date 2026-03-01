@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import homunculus.google_maps as google_maps
+from tests import gmaps_helpers as google_maps
 
 
 class _FakeTarget:

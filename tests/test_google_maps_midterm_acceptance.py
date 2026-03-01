@@ -4,7 +4,8 @@ import re
 import pytest
 from playwright.sync_api import expect, sync_playwright
 
-from homunculus.google_maps import (
+from homunculus.playwright_utils import launch_chromium, new_anonymous_context
+from tests.gmaps_helpers import (
     get_top_place_results,
     get_driving_eta,
     locate_results_panel,
@@ -12,7 +13,6 @@ from homunculus.google_maps import (
     search_location,
     search_places_nearby,
 )
-from homunculus.playwright_utils import launch_chromium, new_anonymous_context
 
 pytestmark = pytest.mark.skipif(
     os.getenv("HOMUNCULUS_RUN_ACCEPTANCE") != "1",

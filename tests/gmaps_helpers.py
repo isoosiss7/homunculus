@@ -1,4 +1,4 @@
-"""Helpers for automating Google Maps with Playwright."""
+"""Google Maps helpers for acceptance tests."""
 
 from __future__ import annotations
 
@@ -6,13 +6,14 @@ import re
 import time
 from typing import Iterable, Sequence
 
+from homunculus import web
 
 _SEARCH_BOX_TIMEOUT_MS = 8000
 
 
 def open_google_maps(page) -> None:
     """Open Google Maps with consistent load behavior."""
-    page.goto("https://www.google.com/maps", wait_until="domcontentloaded")
+    web.open_url(page, "https://www.google.com/maps", wait_until="domcontentloaded")
     _handle_consent_dialog(page)
 
     if not _wait_for_search_box(page, timeout_ms=_SEARCH_BOX_TIMEOUT_MS):
@@ -107,15 +108,29 @@ def get_top_place_results(page, limit: int = 2) -> list[str]:
     return names
 
 
+def find_search_box(page):
+    return _find_search_box(page)
+
+
 def _find_search_box(page):
-    for role in ("combobox", "textbox"):
-        locator = page.get_by_role(role, name=re.compile(r"search", re.I))
-        try:
-            locator.first.wait_for(state="visible", timeout=5000)
-            return locator.first
-        except Exception:
-            continue
-    return page.locator("input#searchboxinput")
+    """Prefer Google Maps' canonical input#searchboxinput when available.
+
+    Google Maps' accessibility tree changes frequently; role-based locators can
+    resolve to wrappers that don't accept keyboard input.
+    """
+    canonical = page.locator("input#searchboxinput").first
+    try:
+        canonical.wait_for(state="visible", timeout=5000)
+        return canonical
+    except Exception:
+        pass
+
+    locator = web.find_search_box(page)
+    try:
+        locator.wait_for(state="visible", timeout=2000)
+        return locator
+    except Exception:
+        return canonical
 
 
 def _wait_for_search_box(page, timeout_ms: int) -> bool:
@@ -143,31 +158,7 @@ def _wait_for_search_box(page, timeout_ms: int) -> bool:
 
 
 def _handle_consent_dialog(page) -> None:
-    """Best-effort dismissal of consent dialogs if they appear."""
-    for frame in [page, *page.frames]:
-        if _try_dismiss_in_frame(frame):
-            return
-
-
-def _try_dismiss_in_frame(frame) -> bool:
-    buttons = (
-        re.compile(r"accept all", re.I),
-        re.compile(r"i agree", re.I),
-        re.compile(r"agree", re.I),
-        re.compile(r"accept", re.I),
-        re.compile(r"reject all", re.I),
-        re.compile(r"decline", re.I),
-        re.compile(r"no thanks", re.I),
-    )
-    for name in buttons:
-        button = frame.get_by_role("button", name=name).first
-        try:
-            button.wait_for(state="visible", timeout=1200)
-            button.click()
-            return True
-        except Exception:
-            continue
-    return False
+    web.dismiss_consent_dialogs(page)
 
 
 def _wait_for_results_panel(page, query: str) -> None:

@@ -11,11 +11,11 @@ class _FakePage:
         Path(path).write_bytes(b"png")
 
 
-def test_capture_maps_failure_writes_artifacts(tmp_path, monkeypatch) -> None:
+def test_capture_failure_writes_artifacts(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(agent, "ARTIFACTS_ROOT", tmp_path)
     monkeypatch.setattr(agent, "snapshot_role_refs", lambda page: ["button:Save"])
 
-    agent._capture_maps_failure(_FakePage(), "run-123", RuntimeError("boom"))
+    agent._capture_failure(_FakePage(), "run-123", RuntimeError("boom"))
 
     artifacts_dir = tmp_path / "run-123"
     assert (artifacts_dir / "failure.png").read_bytes() == b"png"

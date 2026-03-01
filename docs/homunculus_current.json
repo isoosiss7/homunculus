@@ -1,12 +1,12 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T04:26:30.638220+00:00",
-  "milestone": "Add evaluate primitive (page + role-ref + ref wrappers) with timeout normalization and unit tests",
-  "milestone_id": "evaluate-primitive",
+  "last_heartbeat_at": "2026-03-01T04:41:48.163106+00:00",
+  "milestone": "Add wait CLI primitive exposing browser_wait.wait_for (selector/url/load/fn/text/text-gone) + tests",
+  "milestone_id": "cli-wait-primitive",
   "needs_human": false,
-  "run_id": "ce9afcdc719541c28a2b062f9a8dbbd2",
-  "started_at": "2026-03-01T04:26:30.637884+00:00",
+  "run_id": "61eb6cbd18074cbbb78138db700dc298",
+  "started_at": "2026-03-01T04:41:48.162985+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

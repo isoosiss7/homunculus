@@ -12,6 +12,7 @@ from playwright.sync_api import sync_playwright
 from homunculus.agent import run
 from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
+from homunculus.browser_wait import wait_for
 from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
 from homunculus.role_snapshot import snapshot_role_snapshot
@@ -238,6 +239,45 @@ def build_parser() -> argparse.ArgumentParser:
         help="Target wait state when using action=wait",
     )
 
+    wait_parser = subparsers.add_parser(
+        "wait",
+        help="Wait for page conditions",
+    )
+    wait_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    wait_parser.add_argument(
+        "--selector",
+        help="CSS selector to wait for",
+    )
+    wait_parser.add_argument(
+        "--url",
+        help="URL glob pattern to wait for",
+    )
+    wait_parser.add_argument(
+        "--load",
+        help="Load state to wait for",
+    )
+    wait_parser.add_argument(
+        "--fn",
+        help="JavaScript predicate to wait for",
+    )
+    wait_parser.add_argument(
+        "--text",
+        help="Text to wait for",
+    )
+    wait_parser.add_argument(
+        "--text-gone",
+        help="Text that should disappear",
+    )
+    wait_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        default=10000,
+        help="Timeout in milliseconds (default: 10000)",
+    )
+
     return parser
 
 
@@ -425,6 +465,26 @@ def main() -> int:
             )
             if args.print_title:
                 print(page.title())
+        return 0
+
+    if args.command == "wait":
+        with _page_for_target(args.target) as page:
+            try:
+                wait_for(
+                    page,
+                    selector=args.selector,
+                    url=args.url,
+                    load=args.load,
+                    fn=args.fn,
+                    text=args.text,
+                    text_gone=args.text_gone,
+                    timeout_ms=args.timeout_ms,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+            except TimeoutError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
         return 0
 
     parser.error("Unknown command")

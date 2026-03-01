@@ -1,21 +1,15 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T06:09:38.886209+00:00",
+  "last_heartbeat_at": "2026-03-01T06:27:22.411123+00:00",
   "last_milestone": {
-    "id": "checkbox-check-uncheck",
-    "summary": "Add general checkbox actions (check/uncheck) to act() primitive, plus fixture + unit tests."
+    "id": "scrollintoview",
+    "summary": "Added scrollintoview action (locator.scroll_into_view_if_needed) + CLI support + unit tests."
   },
-  "milestone_history": [
-    {
-      "id": "checkbox-check-uncheck",
-      "summary": "Add general checkbox actions (check/uncheck) to act() primitive, plus fixture + unit tests."
-    }
-  ],
   "needs_human": false,
-  "run_id": "e43a3c60103541a6990195100c3e219c",
-  "started_at": "2026-03-01T06:09:38.885676+00:00",
+  "run_id": "46ef4825b0354b7ca95041c5c661dfbd",
+  "started_at": "2026-03-01T06:25:18.553915+00:00",
   "status": "done",
-  "step_id": "done",
-  "step_name": "Complete"
+  "step_id": "milestone_scrollintoview",
+  "step_name": "Add scrollintoview action"
 }

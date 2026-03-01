@@ -335,6 +335,49 @@ def test_act_by_role_ref_wait_visible() -> None:
             browser.close()
 
 
+def test_act_by_role_ref_scroll_into_view() -> None:
+    fixture_path = Path(__file__).parent / "fixtures" / "scroll_into_view.html"
+    html = fixture_path.read_text(encoding="utf-8")
+
+    with sync_playwright() as playwright:
+        try:
+            browser = playwright.chromium.launch()
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        context = browser.new_context()
+        try:
+            page = context.new_page()
+            page.set_content(html, wait_until="domcontentloaded")
+
+            role_ref_str = RoleRef(role="button", name="Scroll target", nth=0).to_str()
+            before = page.evaluate(
+                "() => {"
+                "  const el = document.getElementById('target');"
+                "  const rect = el.getBoundingClientRect();"
+                "  return { top: rect.top, bottom: rect.bottom, innerHeight: window.innerHeight };"
+                "}"
+            )
+
+            assert before["top"] > before["innerHeight"]
+
+            act_by_role_ref(page, role_ref_str, action="scrollintoview")
+
+            after = page.evaluate(
+                "() => {"
+                "  const el = document.getElementById('target');"
+                "  const rect = el.getBoundingClientRect();"
+                "  return { top: rect.top, bottom: rect.bottom, innerHeight: window.innerHeight };"
+                "}"
+            )
+
+            assert after["top"] <= after["innerHeight"]
+            assert after["bottom"] >= 0
+        finally:
+            context.close()
+            browser.close()
+
+
 def test_act_by_role_ref_unsupported_action() -> None:
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
     html = fixture_path.read_text(encoding="utf-8")
@@ -355,7 +398,7 @@ def test_act_by_role_ref_unsupported_action() -> None:
                 ValueError,
                 match=(
                     "Unsupported action 'focus'. Supported actions: click, fill, "
-                    "select, type, press, hover, check, uncheck, wait."
+                    "select, type, press, hover, scrollintoview, check, uncheck, wait."
                 ),
             ):
                 act_by_role_ref(page, role_ref_str, action="focus")

@@ -98,6 +98,10 @@ def act_by_role_ref(
         locator.hover(**action_options)
         return
 
+    if action == "scrollintoview":
+        locator.scroll_into_view_if_needed(**action_options)
+        return
+
     if action == "check":
         locator.check(**action_options)
         return
@@ -118,7 +122,7 @@ def act_by_role_ref(
         "Unsupported action"
         " "
         f"'{action}'. Supported actions: click, fill, select, type, press, hover, "
-        "check, uncheck, wait."
+        "scrollintoview, check, uncheck, wait."
     )
 
 

@@ -1,12 +1,12 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T03:25:15.891256+00:00",
-  "last_milestone": "Add advanced click options to role-ref act (modifiers/button/double_click) + unit tests",
-  "last_milestone_at": "2026-03-01T03:25:15.891256+00:00",
+  "last_heartbeat_at": "2026-03-01T03:40:24.536055+00:00",
+  "last_milestone": "Add RoleSnapshot with compact refs (e1..eN) + CLI snapshot-role-snapshot",
+  "last_milestone_at": "2026-03-01T03:44:52.480711+00:00",
   "needs_human": false,
-  "run_id": "dab1ee6314d2401fb01e6996a2b48af5",
-  "started_at": "2026-03-01T03:23:25.732743+00:00",
+  "run_id": "b0ed760f5ab743babaf91f4b7ebbbe1b",
+  "started_at": "2026-03-01T03:40:24.535725+00:00",
   "status": "done",
   "step_id": "done",
   "step_name": "Complete"

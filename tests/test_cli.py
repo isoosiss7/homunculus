@@ -107,6 +107,57 @@ def test_cli_snapshot_role_refs_json() -> None:
     assert RoleRef(role="textbox", name="User name", nth=0).to_str() in role_refs
 
 
+def test_cli_snapshot_role_snapshot_text() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-role-snapshot",
+            str(fixture_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    lines = result.stdout.splitlines()
+    assert lines[0].startswith("url:")
+    assert lines[1].startswith("title:")
+    assert lines[2].startswith("count:")
+    expected_first = RoleRef(role="button", name="Double target", nth=0).to_str()
+    assert f"e1\t{expected_first}" in lines
+
+
+def test_cli_snapshot_role_snapshot_json() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-role-snapshot",
+            str(fixture_path),
+            "--json",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["stats"]["count"] == len(payload["items"])
+    assert payload["items"][0]["ref"] == "e1"
+    assert payload["ref_to_role_ref"]["e1"] == payload["items"][0]["role_ref"]
+
+
 def test_cli_act_by_role_ref_fill() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"

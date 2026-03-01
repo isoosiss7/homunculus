@@ -14,6 +14,7 @@ from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
+from homunculus.role_snapshot import snapshot_role_snapshot
 from homunculus.snapshot_act import (
     snapshot_then_act_by_role_ref,
     snapshot_then_extract_text_by_role_ref,
@@ -43,6 +44,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="Print role refs as a JSON array (sorted for stable output)",
+    )
+
+    role_snapshot_parser = subparsers.add_parser(
+        "snapshot-role-snapshot",
+        help="Print a stable element snapshot with compact refs",
+    )
+    role_snapshot_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    role_snapshot_parser.add_argument(
+        "--roles",
+        help="Comma-separated list of ARIA roles to include",
+    )
+    role_snapshot_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print the snapshot as JSON",
     )
 
     act_parser = subparsers.add_parser(
@@ -272,6 +291,29 @@ def main() -> int:
         else:
             for role_ref in role_refs:
                 print(role_ref)
+        return 0
+
+    if args.command == "snapshot-role-snapshot":
+        include_roles = None
+        if args.roles is not None:
+            if not args.roles.strip():
+                parser.error("--roles cannot be empty")
+            include_roles = set()
+            for entry in args.roles.split(","):
+                role = entry.strip().lower()
+                if not role:
+                    parser.error("--roles cannot be empty")
+                include_roles.add(role)
+        with _page_for_target(args.target) as page:
+            snapshot = snapshot_role_snapshot(page, include_roles=include_roles)
+        if args.json:
+            print(json.dumps(snapshot.to_dict(), sort_keys=True))
+        else:
+            print(f"url: {snapshot.url}")
+            print(f"title: {snapshot.title}")
+            print(f"count: {snapshot.stats['count']}")
+            for item in snapshot.items:
+                print(f"{item.ref}\t{item.role_ref}")
         return 0
 
     if args.command == "act-by-role-ref":

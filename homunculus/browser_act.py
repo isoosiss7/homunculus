@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from homunculus.role_ref import RoleRef
+from homunculus.web import extract_text
 
 
 def act_by_role_ref(
@@ -51,6 +52,23 @@ def act_by_role_ref(
         "Unsupported action"
         f" '{action}'. Supported actions: click, fill, press, hover, wait."
     )
+
+
+def extract_text_by_role_ref(
+    page,
+    role_ref_str: str,
+    timeout_ms: int | None = None,
+    state: str | None = None,
+) -> str:
+    """Wait for an element addressed by a role ref string, then extract text."""
+    role_ref = RoleRef.from_str(role_ref_str)
+    locator = page.get_by_role(role_ref.role, name=role_ref.name).nth(role_ref.nth)
+    wait_state = state if state is not None else "visible"
+    wait_options: dict[str, str | int] = {"state": wait_state}
+    if timeout_ms is not None:
+        wait_options["timeout"] = timeout_ms
+    locator.wait_for(**wait_options)
+    return extract_text(locator)
 
 
 def act_click_by_role_ref(page, role_ref_str: str) -> None:

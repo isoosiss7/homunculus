@@ -14,7 +14,10 @@ from homunculus.browser_act import act_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.playwright_utils import new_anonymous_context
 from homunculus.role_ref import RoleRef
-from homunculus.snapshot_act import snapshot_then_act_by_role_ref
+from homunculus.snapshot_act import (
+    snapshot_then_act_by_role_ref,
+    snapshot_then_extract_text_by_role_ref,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -116,6 +119,35 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot_act_parser.add_argument(
         "--state",
         help="Target wait state when using action=wait",
+    )
+
+    snapshot_extract_parser = subparsers.add_parser(
+        "snapshot-extract-text",
+        help="Validate a role ref exists and extract its visible text",
+    )
+    snapshot_extract_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    snapshot_extract_parser.add_argument("role_ref", help="Role ref string to extract")
+    snapshot_extract_parser.add_argument(
+        "--include-role",
+        action="append",
+        help="ARIA role to include in snapshot validation (repeatable)",
+    )
+    snapshot_extract_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Wait timeout in milliseconds",
+    )
+    snapshot_extract_parser.add_argument(
+        "--state",
+        help="Target wait state when extracting",
+    )
+    snapshot_extract_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print extracted text as JSON",
     )
 
     act_role_parser = subparsers.add_parser(
@@ -272,6 +304,33 @@ def main() -> int:
                 return 1
             if args.print_title:
                 print(page.title())
+        return 0
+
+    if args.command == "snapshot-extract-text":
+        include_roles = None
+        if args.include_role is not None:
+            include_roles = set()
+            for entry in args.include_role:
+                role = entry.strip().lower() if entry is not None else ""
+                if not role:
+                    parser.error("--include-role cannot be empty")
+                include_roles.add(role)
+        with _page_for_target(args.target) as page:
+            try:
+                text = snapshot_then_extract_text_by_role_ref(
+                    page,
+                    args.role_ref,
+                    include_roles=include_roles,
+                    timeout_ms=args.timeout_ms,
+                    state=args.state,
+                )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        if args.json:
+            print(json.dumps({"text": text, "role_ref": args.role_ref}))
+        else:
+            print(text)
         return 0
 
     if args.command in {"act", "act-by-role"}:

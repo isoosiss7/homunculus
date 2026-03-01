@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from homunculus.browser_wait import wait_for
 from homunculus.role_snapshot import (
     RoleSnapshot,
     act_by_ref,
@@ -124,9 +125,42 @@ def snapshot_then_evaluate_by_ref(
     return snapshot, result
 
 
+def snapshot_then_wait(
+    page,
+    *,
+    selector: str | None = None,
+    url: str | None = None,
+    load: str | None = None,
+    fn: str | None = None,
+    text: str | None = None,
+    text_gone: str | None = None,
+    timeout_ms: int = 10000,
+    include_roles: set[str] | None = None,
+    visible_only: bool = True,
+) -> RoleSnapshot:
+    """Snapshot role refs, then wait for general page conditions."""
+    snapshot = snapshot_role_snapshot(
+        page,
+        include_roles=include_roles,
+        visible_only=visible_only,
+    )
+    wait_for(
+        page,
+        selector=selector,
+        url=url,
+        load=load,
+        fn=fn,
+        text=text,
+        text_gone=text_gone,
+        timeout_ms=timeout_ms,
+    )
+    return snapshot
+
+
 __all__ = [
     "snapshot_then_act_by_ref",
     "snapshot_then_drag_by_ref",
     "snapshot_then_extract_text_by_ref",
     "snapshot_then_evaluate_by_ref",
+    "snapshot_then_wait",
 ]

@@ -1,15 +1,16 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T06:43:23.114836+00:00",
+  "last_heartbeat_at": "2026-03-01T06:54:15.606161+00:00",
   "last_milestone": {
-    "id": "cli_evaluate",
-    "summary": "Added CLI evaluate primitives: evaluate-by-role-ref + snapshot-evaluate-by-ref, with tests."
+    "id": "snapshot_then_wait",
+    "summary": "Added snapshot_then_wait helper (pre-wait RoleSnapshot + page condition waits)"
   },
+  "last_milestone_at": "2026-03-01T06:55:44.952177+00:00",
   "needs_human": false,
-  "run_id": "ea99d432f6da4f6993e12e5eb9b78bd2",
-  "started_at": "2026-03-01T06:41:18.425973+00:00",
+  "run_id": "bd407ecf0c9f400b83f12a7988f87cee",
+  "started_at": "2026-03-01T06:54:15.605829+00:00",
   "status": "done",
-  "step_id": "milestone_cli_evaluate",
-  "step_name": "Add CLI evaluate primitives"
+  "step_id": "milestone",
+  "step_name": "snapshot_then_wait"
 }

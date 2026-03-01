@@ -12,6 +12,7 @@ from homunculus.role_snapshot_act import (
     snapshot_then_act_by_ref,
     snapshot_then_evaluate_by_ref,
     snapshot_then_extract_text_by_ref,
+    snapshot_then_wait,
 )
 
 
@@ -148,6 +149,51 @@ def test_snapshot_then_evaluate_by_ref_missing_ref_timeout() -> None:
 
             assert snapshot.stats["count"] > 0
             assert result is None
+        finally:
+            context.close()
+            browser.close()
+
+
+def test_snapshot_then_wait_selector_success() -> None:
+    html = "<html><body><div id='root'>ready</div></body></html>"
+
+    with sync_playwright() as playwright:
+        try:
+            browser, context, page = _load_fixture_page(playwright, html)
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        try:
+            page.evaluate(
+                """
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.id = 'result';
+                    el.textContent = 'done';
+                    document.body.appendChild(el);
+                }, 50);
+                """
+            )
+            snapshot = snapshot_then_wait(page, selector="#result", timeout_ms=1000)
+
+            assert snapshot.stats["count"] > 0
+        finally:
+            context.close()
+            browser.close()
+
+
+def test_snapshot_then_wait_timeout() -> None:
+    html = "<html><body><div id='root'>ready</div></body></html>"
+
+    with sync_playwright() as playwright:
+        try:
+            browser, context, page = _load_fixture_page(playwright, html)
+        except PlaywrightError as exc:
+            pytest.skip(f"Playwright browsers not installed: {exc}")
+
+        try:
+            with pytest.raises(TimeoutError):
+                snapshot_then_wait(page, selector="#missing", timeout_ms=50)
         finally:
             context.close()
             browser.close()

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RoleRef Wait Fixture</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      #delayed {
+        display: none;
+      }
+    </style>
+    <script>
+      function showDelayed() {
+        document.getElementById("delayed").style.display = "inline-block";
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        setTimeout(showDelayed, 100);
+      });
+    </script>
+  </head>
+  <body>
+    <button id="delayed" type="button">Delayed button</button>
+  </body>
+</html>

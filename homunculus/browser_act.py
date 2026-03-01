@@ -10,6 +10,7 @@ def act_by_role_ref(
     value: str | None = None,
     key: str | None = None,
     timeout_ms: int | None = None,
+    state: str | None = None,
 ) -> None:
     """Perform an action on an element addressed by a role ref string."""
     role_ref = RoleRef.from_str(role_ref_str)
@@ -38,8 +39,17 @@ def act_by_role_ref(
         locator.hover(**action_options)
         return
 
+    if action == "wait":
+        wait_state = state if state is not None else "visible"
+        wait_options: dict[str, str | int] = {"state": wait_state}
+        if timeout_ms is not None:
+            wait_options["timeout"] = timeout_ms
+        locator.wait_for(**wait_options)
+        return
+
     raise ValueError(
-        f"Unsupported action '{action}'. Supported actions: click, fill, press, hover."
+        "Unsupported action"
+        f" '{action}'. Supported actions: click, fill, press, hover, wait."
     )
 
 

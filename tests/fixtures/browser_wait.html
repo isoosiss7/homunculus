@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Browser Wait Fixture</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      #late {
+        display: none;
+      }
+    </style>
+    <script>
+      window.delayedFlag = false;
+
+      function showLate() {
+        document.getElementById("late").style.display = "inline-block";
+      }
+
+      function setFlag() {
+        window.delayedFlag = true;
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        setTimeout(showLate, 80);
+        setTimeout(setFlag, 140);
+      });
+    </script>
+  </head>
+  <body>
+    <button id="late" type="button">Late button</button>
+  </body>
+</html>

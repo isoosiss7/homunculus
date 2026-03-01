@@ -1,11 +1,18 @@
 {
   "human_question": null,
   "last_error": null,
-  "last_heartbeat_at": "2026-03-01T01:55:26.621446+00:00",
+  "last_heartbeat_at": "2026-03-01T02:24:11.164631+00:00",
+  "last_milestone": "wait_for primitives",
+  "milestones": [
+    {
+      "milestone": "Add general-purpose wait_for(page, selector/url/load/fn) with shared timeout budget + unit tests",
+      "ts": "2026-02-28T20:20:00-06:00"
+    }
+  ],
   "needs_human": false,
-  "run_id": "3ac5d830f00c44ceae8e87cae8dc17ee",
-  "started_at": "2026-03-01T01:54:14.471747+00:00",
+  "run_id": "2f9a212ea83b42f68356f2e5f527c4dd",
+  "started_at": "2026-03-01T02:24:11.164274+00:00",
   "status": "done",
-  "step_id": "milestone_snapshot_extract_text",
-  "step_name": "Primitive: snapshot-extract-text (role-ref text extraction)"
+  "step_id": "done",
+  "step_name": "Complete"
 }

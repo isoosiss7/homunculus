@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from homunculus.agent import run
 from homunculus.browser_act import act_by_role_ref
+from homunculus.browser_evaluate import evaluate_by_role_ref
 from homunculus.browser_snapshot import snapshot_role_refs
 from homunculus.browser_wait import wait_for
 from homunculus.playwright_utils import new_anonymous_context
@@ -18,6 +19,7 @@ from homunculus.role_ref import RoleRef
 from homunculus.role_snapshot import snapshot_role_snapshot
 from homunculus.role_snapshot_act import (
     snapshot_then_act_by_ref,
+    snapshot_then_evaluate_by_ref,
     snapshot_then_extract_text_by_ref,
 )
 from homunculus.snapshot_act import (
@@ -330,6 +332,60 @@ def build_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="Print extracted text as JSON",
+    )
+
+    evaluate_by_role_ref_parser = subparsers.add_parser(
+        "evaluate-by-role-ref",
+        help="Evaluate a locator function against a role ref",
+    )
+    evaluate_by_role_ref_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    evaluate_by_role_ref_parser.add_argument(
+        "role_ref",
+        help="Role ref string to evaluate",
+    )
+    evaluate_by_role_ref_parser.add_argument(
+        "--fn",
+        required=True,
+        help="JavaScript function string to pass to locator.evaluate(fn)",
+    )
+    evaluate_by_role_ref_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Wait/evaluate timeout in milliseconds",
+    )
+    evaluate_by_role_ref_parser.add_argument(
+        "--state",
+        help="Target wait state when evaluating",
+    )
+
+    snapshot_evaluate_by_ref_parser = subparsers.add_parser(
+        "snapshot-evaluate-by-ref",
+        help="Snapshot role refs, then evaluate a locator function by snapshot ref",
+    )
+    snapshot_evaluate_by_ref_parser.add_argument(
+        "target",
+        help="Target URL (http/https) or local HTML file path",
+    )
+    snapshot_evaluate_by_ref_parser.add_argument(
+        "ref",
+        help="Snapshot ref string to evaluate (e1, e2, ...)",
+    )
+    snapshot_evaluate_by_ref_parser.add_argument(
+        "--fn",
+        required=True,
+        help="JavaScript function string to pass to locator.evaluate(fn)",
+    )
+    snapshot_evaluate_by_ref_parser.add_argument(
+        "--timeout-ms",
+        type=int,
+        help="Wait/evaluate timeout in milliseconds",
+    )
+    snapshot_evaluate_by_ref_parser.add_argument(
+        "--state",
+        help="Target wait state when evaluating",
     )
 
     act_role_parser = subparsers.add_parser(
@@ -674,6 +730,48 @@ def main() -> int:
             print(json.dumps({"text": text, "ref": args.ref}))
         else:
             print(text)
+        return 0
+
+    if args.command == "evaluate-by-role-ref":
+        if not args.fn.strip():
+            parser.error("--fn cannot be empty")
+        with _page_for_target(args.target) as page:
+            try:
+                result = evaluate_by_role_ref(
+                    page,
+                    args.role_ref,
+                    args.fn,
+                    args.timeout_ms,
+                    args.state,
+                )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            except TimeoutError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        print(json.dumps(result))
+        return 0
+
+    if args.command == "snapshot-evaluate-by-ref":
+        if not args.fn.strip():
+            parser.error("--fn cannot be empty")
+        with _page_for_target(args.target) as page:
+            try:
+                snapshot, result = snapshot_then_evaluate_by_ref(
+                    page,
+                    args.ref,
+                    args.fn,
+                    timeout_ms=args.timeout_ms,
+                    state=args.state,
+                )
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            except TimeoutError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        print(json.dumps({"snapshot": snapshot.to_dict(), "result": result}, sort_keys=True))
         return 0
 
     if args.command in {"act", "act-by-role"}:

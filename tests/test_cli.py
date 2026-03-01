@@ -727,6 +727,108 @@ def test_cli_snapshot_extract_text_by_ref_missing_ref() -> None:
     assert "not found" in result.stderr.lower()
 
 
+def test_cli_evaluate_by_role_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Submit", nth=0).to_str()
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "evaluate-by-role-ref",
+            str(fixture_path),
+            role_ref,
+            "--fn",
+            "el => el.textContent.trim()",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload == "Submit"
+
+
+def test_cli_evaluate_by_role_ref_invalid_role_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "evaluate-by-role-ref",
+            str(fixture_path),
+            "invalid",
+            "--fn",
+            "el => el.textContent.trim()",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "invalid role ref" in result.stderr.lower()
+
+
+def test_cli_snapshot_evaluate_by_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+    role_ref = RoleRef(role="button", name="Submit", nth=0).to_str()
+    ref = _snapshot_ref_for_role_ref(fixture_path, role_ref)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-evaluate-by-ref",
+            str(fixture_path),
+            ref,
+            "--fn",
+            "el => el.textContent.trim()",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["result"] == "Submit"
+    assert payload["snapshot"]["ref_to_role_ref"][ref] == role_ref
+
+
+def test_cli_snapshot_evaluate_by_ref_missing_ref() -> None:
+    _ensure_playwright_available()
+    fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "homunculus",
+            "snapshot-evaluate-by-ref",
+            str(fixture_path),
+            "e9999",
+            "--fn",
+            "el => el.textContent.trim()",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "not found" in result.stderr.lower()
+
+
 def test_cli_act_click_print_title() -> None:
     _ensure_playwright_available()
     fixture_path = Path(__file__).parent / "fixtures" / "role_ref.html"

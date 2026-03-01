@@ -3,6 +3,7 @@ from __future__ import annotations
 from homunculus.role_snapshot import RoleSnapshot, snapshot_role_snapshot
 from homunculus.role_snapshot_act import (
     snapshot_then_act_by_ref,
+    snapshot_then_drag_by_ref,
     snapshot_then_evaluate_by_ref,
     snapshot_then_extract_text_by_ref,
     snapshot_then_wait,
@@ -51,6 +52,23 @@ class BrowserPrimitives:
             modifiers=modifiers,
             button=button,
             double_click=double_click,
+            include_roles=include_roles,
+            visible_only=visible_only,
+        )
+
+    def drag(
+        self,
+        start_ref: str,
+        end_ref: str,
+        timeout_ms: int | None = None,
+        include_roles: set[str] | None = None,
+        visible_only: bool = True,
+    ) -> RoleSnapshot:
+        return snapshot_then_drag_by_ref(
+            self._page,
+            start_ref,
+            end_ref,
+            timeout_ms=timeout_ms,
             include_roles=include_roles,
             visible_only=visible_only,
         )
